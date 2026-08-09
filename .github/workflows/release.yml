@@ -74,21 +74,15 @@ jobs:
 
       - name: Sync README install refs to newest tag (auto-patch)
         if: steps.plan.outputs.action == 'bump_and_tag'
-        # Folds the install-ref rewrite into the same chore(release): commit
-        # that bumps package.json, so the README bumps in lockstep with the
-        # tag. The helper refuses to rewrite if the source tag is missing or
-        # the destination already appears, so it cannot loop on its own. The
-        # job guard then skips this workflow on the chore(release): commit.
+        # Rewrite every `claude-skills#vX.Y.Z` token in README to point at the
+        # tag we are about to publish. Anchored on `claude-skills#` so the
+        # historical prose on line 17 is left alone. Folds into the same
+        # chore(release): commit; the workflow guard skips re-runs on it.
         # tag_only (manual major/minor) keeps README in the originating PR.
         run: |
           set -euo pipefail
           NEW_TAG="${{ steps.plan.outputs.release_tag }}"
-          OLD_TAG="${{ steps.plan.outputs.highest_tag }}"
-          if [ -z "${OLD_TAG}" ]; then
-            echo "No prior tag — nothing to rewrite in README."
-            exit 0
-          fi
-          node scripts/release-version.mjs readme-sync "${OLD_TAG}" "${NEW_TAG}"
+          sed -i -E "s|claude-skills#v[0-9]+\.[0-9]+\.[0-9]+|claude-skills#${NEW_TAG}|g" README.md
 
       - name: Commit bump + annotated tag on exact SHA
         if: steps.plan.outputs.action == 'bump_and_tag'
