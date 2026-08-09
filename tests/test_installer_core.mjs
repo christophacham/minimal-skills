@@ -76,15 +76,17 @@ describe('catalog groups', () => {
     assert.ok(d.has('brave-search'));
     assert.ok(d.has('tavily-search'));
     assert.ok(!d.has('architecture-design'));
+    assert.ok(!d.has('arxiv-prior-art'));
     assert.ok(!d.has('defectdojo-fix'));
     assert.ok(!d.has('ink-cli-tui'));
   });
 
-  it('known suite is the eleven kept skills', () => {
+  it('known suite is the twelve kept skills', () => {
     assert.deepEqual(
       [...known].sort(),
       [
         'architecture-design',
+        'arxiv-prior-art',
         'brave-search',
         'ddg-search',
         'defectdojo-fix',
