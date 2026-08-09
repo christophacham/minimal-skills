@@ -72,6 +72,18 @@ jobs:
         if: steps.plan.outputs.action == 'bump_and_tag'
         run: node scripts/release-version.mjs write "${{ steps.plan.outputs.release_version }}"
 
+      - name: Sync README install refs to newest tag (auto-patch)
+        if: steps.plan.outputs.action == 'bump_and_tag'
+        # Rewrite every `claude-skills#vX.Y.Z` token in README to point at the
+        # tag we are about to publish. Anchored on `claude-skills#` so the
+        # historical prose on line 17 is left alone. Folds into the same
+        # chore(release): commit; the workflow guard skips re-runs on it.
+        # tag_only (manual major/minor) keeps README in the originating PR.
+        run: |
+          set -euo pipefail
+          NEW_TAG="${{ steps.plan.outputs.release_tag }}"
+          sed -i -E "s|claude-skills#v[0-9]+\.[0-9]+\.[0-9]+|claude-skills#${NEW_TAG}|g" README.md
+
       - name: Commit bump + annotated tag on exact SHA
         if: steps.plan.outputs.action == 'bump_and_tag'
         run: |
@@ -85,7 +97,7 @@ jobs:
             exit 1
           fi
 
-          git add package.json package-lock.json
+          git add package.json package-lock.json README.md
           git commit -m "chore(release): v${VER}"
           BUMP_SHA="$(git rev-parse HEAD)"
 
@@ -155,3 +167,4 @@ jobs:
           git tag -a "$TAG" -m "$TAG" "$SHA"
           git push origin "refs/tags/${TAG}"
           echo "Tagged $TAG at $SHA (${{ steps.plan.outputs.reason }})"
+          echo "Reminder: tag_only path (manual major/minor) does not auto-rewrite README. Update README install refs to #${TAG} in the originating PR."
