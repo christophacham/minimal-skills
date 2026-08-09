@@ -40,6 +40,7 @@ class SuiteShapeTests(unittest.TestCase):
             "geometric-robustness",
             "defectdojo-fix",
             "ink-cli-tui",
+            "arxiv-prior-art",
         ):
             self.assertTrue(
                 (SKILLS / kept / "SKILL.md").is_file(),
@@ -70,6 +71,7 @@ class SuiteShapeTests(unittest.TestCase):
             "architecture-design",
             "distributed-architecture",
             "geometric-robustness",
+            "arxiv-prior-art",
         ):
             self.assertIn(f"id: '{kept}'", catalog)
 
@@ -114,6 +116,7 @@ class SuiteShapeTests(unittest.TestCase):
             "geometric-robustness",
             "refactoring",
             "repo-discovery",
+            "arxiv-prior-art",
         }
         for skill in sorted(other_ids | {"ink-cli-tui"}):
             root = SKILLS / skill

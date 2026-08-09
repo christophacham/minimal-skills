@@ -23,6 +23,7 @@ class KeptSkillPresenceTests(unittest.TestCase):
             "geometric-robustness",
             "defectdojo-fix",
             "ink-cli-tui",
+            "arxiv-prior-art",
         ):
             text = (SKILLS / skill_id / "SKILL.md").read_text(encoding="utf-8")
             self.assertTrue(text.startswith("---\n"), skill_id)
