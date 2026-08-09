@@ -94,23 +94,6 @@ function emitGithubOutput(plan) {
   appendFileSync(path, lines.join('\n') + '\n', 'utf8');
 }
 
-/**
- * Rewrite every `github:christophacham/claude-skills#v<oldTag>` token in
- * README.md to point at `v<newTag>`. Refuses to run if the source tag is
- * missing or the swap would be a no-op, so this can be safely wired into
- * the release workflow without ever silently corrupting docs.
- *
- * Why fail-closed:
- *   - We only ever swap a tag we know the README was last pointing at.
- *   - If the README has already moved on (e.g. a previous release ran this
- *     and we are re-running), we leave it alone instead of re-rewriting.
- *   - Loop break is handled by the workflow guard on the commit subject,
- *     not by this script.
- *
- * @param {string} oldTag  e.g. v1.0.0 (the tag the README currently tracks)
- * @param {string} newTag  e.g. v1.0.1 (the tag we are about to publish)
- * @returns {{ updated: boolean, from: string, to: string, hits: number, reason: string }}
- */
 function usage() {
   console.log(`release-version — DIY suite tags (no external version libs)
 
