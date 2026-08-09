@@ -17,6 +17,7 @@ import {
   planRelease,
   highestReleaseTag,
   parseSemver,
+  tagFromVersion,
   RELEASE_COMMIT_PREFIX,
 } from '../lib/release-plan.js';
 
@@ -24,6 +25,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const PKG_PATH = join(ROOT, 'package.json');
 const LOCK_PATH = join(ROOT, 'package-lock.json');
+const README_PATH = join(ROOT, 'README.md');
 
 function readPackageVersion() {
   const pkg = JSON.parse(readFileSync(PKG_PATH, 'utf8'));
@@ -94,12 +96,96 @@ function emitGithubOutput(plan) {
   appendFileSync(path, lines.join('\n') + '\n', 'utf8');
 }
 
+/**
+ * Rewrite every `github:christophacham/claude-skills#v<oldTag>` token in
+ * README.md to point at `v<newTag>`. Refuses to run if the source tag is
+ * missing or the swap would be a no-op, so this can be safely wired into
+ * the release workflow without ever silently corrupting docs.
+ *
+ * Why fail-closed:
+ *   - We only ever swap a tag we know the README was last pointing at.
+ *   - If the README has already moved on (e.g. a previous release ran this
+ *     and we are re-running), we leave it alone instead of re-rewriting.
+ *   - Loop break is handled by the workflow guard on the commit subject,
+ *     not by this script.
+ *
+ * @param {string} oldTag  e.g. v1.0.0 (the tag the README currently tracks)
+ * @param {string} newTag  e.g. v1.0.1 (the tag we are about to publish)
+ * @returns {{ updated: boolean, from: string, to: string, hits: number, reason: string }}
+ */
+function syncReadmeTag(oldTag, newTag) {
+  if (oldTag === newTag) {
+    return {
+      updated: false,
+      from: oldTag,
+      to: newTag,
+      hits: 0,
+      reason: 'old and new tag are identical — nothing to swap',
+    };
+  }
+  if (!parseSemver(oldTag.slice(1)) || !parseSemver(newTag.slice(1))) {
+    throw new Error(`syncReadmeTag: tags must be vX.Y.Z (got ${oldTag}, ${newTag})`);
+  }
+  if (!existsSync(README_PATH)) {
+    throw new Error(`syncReadmeTag: ${README_PATH} does not exist`);
+  }
+
+  const before = readFileSync(README_PATH, 'utf8');
+  const target = `github:christophacham/claude-skills#${oldTag}`;
+  const replacement = `github:christophacham/claude-skills#${newTag}`;
+
+  // No occurrences of the old tag → README is already ahead (or never had it).
+  // Fail closed: do not rewrite, do not invent, do not loop.
+  if (!before.includes(target)) {
+    return {
+      updated: false,
+      from: oldTag,
+      to: newTag,
+      hits: 0,
+      reason: `README does not contain ${target} — already ahead or never tracked it`,
+    };
+  }
+  // Guard: never introduce the new tag into a place that already had it
+  // (would imply duplicate installs in docs). Cheap sanity check.
+  const occurrencesOfNew = before.split(replacement).length - 1;
+  if (occurrencesOfNew > 0) {
+    return {
+      updated: false,
+      from: oldTag,
+      to: newTag,
+      hits: 0,
+      reason: `README already contains ${replacement} (${occurrencesOfNew}x) — refusing to duplicate`,
+    };
+  }
+
+  const after = before.split(target).join(replacement);
+  const hits = before.split(target).length - 1;
+  if (after === before) {
+    return {
+      updated: false,
+      from: oldTag,
+      to: newTag,
+      hits: 0,
+      reason: 'no-op (defensive)',
+    };
+  }
+  writeFileSync(README_PATH, after, 'utf8');
+  return {
+    updated: true,
+    from: oldTag,
+    to: newTag,
+    hits,
+    reason: `rewrote ${hits} occurrence(s) of ${target} → ${replacement}`,
+  };
+}
+
 function usage() {
   console.log(`release-version — DIY suite tags (no external version libs)
 
 Usage:
   node scripts/release-version.mjs plan [--github-output]
   node scripts/release-version.mjs write <X.Y.Z>
+  node scripts/release-version.mjs readme-sync <oldTag> <newTag>   # rewrite README install refs
   node scripts/release-version.mjs list-tags
 
 Policy:
@@ -145,6 +231,20 @@ if (cmd === 'write') {
   }
   writeVersion(version);
   console.log(JSON.stringify({ wrote: version, package: PKG_PATH }, null, 2));
+  process.exit(0);
+}
+
+if (cmd === 'readme-sync') {
+  const oldTag = args[1];
+  const newTag = args[2];
+  if (!oldTag || !newTag) {
+    console.error('readme-sync: missing <oldTag> <newTag> (both must be vX.Y.Z)');
+    process.exit(1);
+  }
+  const result = syncReadmeTag(oldTag, newTag);
+  console.log(JSON.stringify({ readme: README_PATH, ...result }, null, 2));
+  // Updated: caller (release workflow) will git add + commit.
+  // Not updated: also success — README is already ahead, nothing to do.
   process.exit(0);
 }
 
