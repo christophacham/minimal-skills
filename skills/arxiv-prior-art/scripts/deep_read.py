@@ -18,6 +18,7 @@ RAM, no GPU. If pymupdf is missing and a markdown must be produced, exits
 arXiv abs link instead of failing the whole skill run.
 """
 
+import gc
 import re
 import sys
 import urllib.request
@@ -31,6 +32,54 @@ def parse_id(raw: str) -> str:
     if not m:
         sys.exit(f"error: cannot parse arXiv id from {raw!r}")
     return m.group(1)
+
+
+def parse_args(args: list[str]) -> tuple[str, Path]:
+    """Extract positional arXiv id and optional --cache dir robustly."""
+    positionals: list[str] = []
+    cache = Path.cwd()
+    skip_next = False
+    for i, a in enumerate(args):
+        if skip_next:
+            skip_next = False
+            continue
+        if a == "--cache":
+            if i + 1 >= len(args):
+                sys.exit("error: --cache requires a directory path")
+            cache = Path(args[i + 1])
+            skip_next = True
+            continue
+        positionals.append(a)
+
+    if not positionals:
+        sys.exit(__doc__)
+    return parse_id(positionals[0]), cache
+
+
+def download_pdf(paper_id: str, pdf_path: Path) -> None:
+    """Download PDF to a temp file, validate, then atomically replace."""
+    url = f"https://arxiv.org/pdf/{paper_id}"
+    print(f"downloading {url} -> {pdf_path}")
+    req = urllib.request.Request(url, headers=UA)
+    tmp_path = pdf_path.with_suffix(pdf_path.suffix + ".part")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            if r.status != 200:
+                raise RuntimeError(
+                    f"expected status 200, got {r.status} from {url}"
+                )
+            ct = r.headers.get("content-type", "").lower()
+            if not ct.startswith("application/pdf"):
+                raise RuntimeError(
+                    f"expected content-type application/pdf, got {ct!r} from {url}"
+                )
+            with open(tmp_path, "wb") as f:
+                f.write(r.read())
+        tmp_path.replace(pdf_path)
+    except Exception:
+        if tmp_path.exists():
+            tmp_path.unlink()
+        raise
 
 
 def convert(pdf_path: Path, md_path: Path) -> int:
@@ -47,10 +96,13 @@ def convert(pdf_path: Path, md_path: Path) -> int:
         if text:
             lines.append(text)
         for img_index, img in enumerate(page.get_images(full=True), start=1):
+            pix = None
             try:
                 pix = pymupdf.Pixmap(doc, img[0])
                 if pix.n - pix.alpha > 3:  # CMYK -> RGB
-                    pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
+                    rgb = pymupdf.Pixmap(pymupdf.csRGB, pix)
+                    pix = None
+                    pix = rgb
                 if pix.width < 64 or pix.height < 64:  # skip icons/rules
                     continue
                 name = f"{stem}_p{page_no}_{img_index}.png"
@@ -59,17 +111,18 @@ def convert(pdf_path: Path, md_path: Path) -> int:
                 n_images += 1
             except Exception as e:
                 lines.append(f"\n<!-- image p{page_no}/{img_index} skipped: {e} -->\n")
+            finally:
+                if pix is not None:
+                    pix = None
+        # PyMuPDF holds native resources; reassignment alone may delay release.
+        gc.collect()
     md_path.write_text("\n".join(lines), encoding="utf-8")
     doc.close()
     return n_images
 
 
 def main() -> None:
-    args = sys.argv[1:]
-    if not args:
-        sys.exit(__doc__)
-    cache = Path(args[args.index("--cache") + 1]) if "--cache" in args else Path.cwd()
-    paper_id = parse_id(args[0])
+    paper_id, cache = parse_args(sys.argv[1:])
     cache.mkdir(parents=True, exist_ok=True)
 
     md_path = cache / f"{paper_id}.md"
@@ -82,13 +135,9 @@ def main() -> None:
         return
 
     # state 2: have the pdf but no markdown — convert only
+    # state 3: neither — download first
     if not pdf_path.exists():
-        # state 3: neither — download first
-        url = f"https://arxiv.org/pdf/{paper_id}"
-        print(f"downloading {url} -> {pdf_path}")
-        req = urllib.request.Request(url, headers=UA)
-        with urllib.request.urlopen(req, timeout=60) as r, open(pdf_path, "wb") as f:
-            f.write(r.read())
+        download_pdf(paper_id, pdf_path)
 
     try:
         n = convert(pdf_path, md_path)
