@@ -34,6 +34,7 @@ class SuiteShapeTests(unittest.TestCase):
             "tavily-search",
             "simple-design",
             "refactoring",
+            "repo-discovery",
             "architecture-design",
             "distributed-architecture",
             "geometric-robustness",
@@ -65,6 +66,7 @@ class SuiteShapeTests(unittest.TestCase):
         for kept in (
             "simple-design",
             "refactoring",
+            "repo-discovery",
             "architecture-design",
             "distributed-architecture",
             "geometric-robustness",
@@ -81,6 +83,7 @@ class SuiteShapeTests(unittest.TestCase):
         self.assertIn("`simple-design`", readme)
         self.assertIn("`architecture-design`", readme)
         self.assertIn("`refactoring`", readme)
+        self.assertIn("`repo-discovery`", readme)
 
     def test_slim_and_om_handbooks_are_gone(self) -> None:
         self.assertFalse((ROOT / "SLIM.md").exists())
@@ -110,6 +113,7 @@ class SuiteShapeTests(unittest.TestCase):
             "distributed-architecture",
             "geometric-robustness",
             "refactoring",
+            "repo-discovery",
         }
         for skill in sorted(other_ids | {"ink-cli-tui"}):
             root = SKILLS / skill

@@ -1,6 +1,6 @@
 # claude-skills
 
-Selective Claude Code skills: search helpers, simple design, refactoring, architecture craft, DefectDojo ops, and Ink TUI craft — plus a plan-then-apply Node installer.
+Selective Claude Code skills: search helpers, simple design, refactoring, repo discovery, architecture craft, DefectDojo ops, and Ink TUI craft — plus a plan-then-apply Node installer.
 
 ---
 
@@ -160,6 +160,7 @@ Catalog groups (selective Node installer): **SEARCH** · **CORE** (default-yes) 
 ### CORE (default-yes)
 - **`simple-design`**: Ousterhout deep modules, information hiding, red flags.
 - **`refactoring`**: Fowler smells and safe structural steps.
+- **`repo-discovery`**: Scan an unfamiliar repo and write or refresh `CLAUDE.md` (agent-facing map: commands, layout, gotchas). Defaults to project-root output; refuses to invent content for an empty tree.
 
 ### OPT_IN (offer, never default-yes)
 - **`architecture-design`**: Clean Architecture layering, ports & adapters.

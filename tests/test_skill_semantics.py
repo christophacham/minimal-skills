@@ -17,6 +17,7 @@ class KeptSkillPresenceTests(unittest.TestCase):
             "tavily-search",
             "simple-design",
             "refactoring",
+            "repo-discovery",
             "architecture-design",
             "distributed-architecture",
             "geometric-robustness",
@@ -61,6 +62,17 @@ class RefactoringSkillTests(unittest.TestCase):
         self.assertTrue(
             "smell" in lowered or "mechanics" in lowered or "fowler" in lowered
         )
+
+
+class RepoDiscoverySkillTests(unittest.TestCase):
+    def test_writes_claudemd_from_evidence(self) -> None:
+        text = (SKILLS / "repo-discovery" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("name: repo-discovery", text)
+        self.assertIn("CLAUDE.md", text)
+        # Skill must refuse to invent content for an empty tree.
+        self.assertIn("empty", text.lower())
+        # Must call out no inventing commands/architecture/etc.
+        self.assertIn("invent", text.lower())
 
 
 class DefectDojoSkillTests(unittest.TestCase):
