@@ -87,8 +87,14 @@ jobs:
             exit 1
           fi
           sed -i -E "s|claude-skills#v[0-9]+\.[0-9]+\.[0-9]+|claude-skills#${NEW_TAG}|g" README.md
-          if ! grep -q "claude-skills#${NEW_TAG}" README.md; then
+          REFS="$(grep -oE 'claude-skills#v[0-9]+\.[0-9]+\.[0-9]+' README.md || true)"
+          if [ -z "${REFS}" ]; then
             echo "::error::README.md had no claude-skills#vX.Y.Z install refs to sync to ${NEW_TAG}"
+            exit 1
+          fi
+          if echo "${REFS}" | grep -vq "^claude-skills#${NEW_TAG}$"; then
+            echo "::error::README.md still has install refs not at ${NEW_TAG}:"
+            echo "${REFS}" | grep -v "^claude-skills#${NEW_TAG}$" || true
             exit 1
           fi
 
