@@ -105,10 +105,10 @@ jobs:
             exit 1
           fi
 
-          git add package.json package-lock.json
-          if ! git diff --quiet -- README.md; then
-            git add README.md
-          fi
+          # Always stage README after the fail-closed sync above. git add of an
+          # unchanged file is a no-op for the commit tree; package.json always
+          # changes on bump_and_tag so the commit is never empty.
+          git add package.json package-lock.json README.md
           git commit -m "chore(release): v${VER}"
           BUMP_SHA="$(git rev-parse HEAD)"
 
