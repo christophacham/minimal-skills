@@ -18,13 +18,13 @@ First release is **`v1.0.0`**. Each merge to `main` auto-tags the next **patch**
 
 ```sh
 # from any project directory — pin a known release
-npx -y github:christophacham/claude-skills#v1.0.5
+npx -y github:christophacham/claude-skills#v1.0.6
 ```
 
 Same idea with Bun:
 
 ```sh
-bunx github:christophacham/claude-skills#v1.0.5
+bunx github:christophacham/claude-skills#v1.0.6
 ```
 
 Tip of `main` (always newest commit; may stick in runner caches after merges):
@@ -39,16 +39,16 @@ If a run still shows retired process skills (pre-suite CORE), the CLI exits with
 ```sh
 # Bun
 rm -rf ~/.bun/install/cache ~/.bun/install/git /tmp/bunx-*-claude-skills*
-bunx github:christophacham/claude-skills#v1.0.5
+bunx github:christophacham/claude-skills#v1.0.6
 
 # npm / npx
 npm cache clean --force
-npx -y github:christophacham/claude-skills#v1.0.5
+npx -y github:christophacham/claude-skills#v1.0.6
 ```
 
 Do **not** use `@latest` / `npx claude-skills@…` — that is npm-registry semantics. This suite is installed from GitHub; the unscoped npm name `claude-skills` is a different package.
 
-Check what you ran: `npx -y github:christophacham/claude-skills#v1.0.5 --version`
+Check what you ran: `npx -y github:christophacham/claude-skills#v1.0.6 --version`
 
 ### Versioning (DIY — no external version packages)
 
@@ -139,7 +139,7 @@ Use `--skip-deps` to skip npm/pip/uv setup on apply.
 | **Global (tracked)** | Only items recorded in `~/.claude/claude-skills-manifest.json` |
 
 ```sh
-npx -y github:christophacham/claude-skills#v1.0.5 uninstall   # confirm, then remove tracked global items
+npx -y github:christophacham/claude-skills#v1.0.6 uninstall   # confirm, then remove tracked global items
 node bin/cli.js uninstall --yes                            # no confirm (from a clone)
 # or from Manage installation → Uninstall tracked GLOBAL items
 ```
