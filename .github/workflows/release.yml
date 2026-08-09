@@ -82,7 +82,15 @@ jobs:
         run: |
           set -euo pipefail
           NEW_TAG="${{ steps.plan.outputs.release_tag }}"
+          if [[ ! "${NEW_TAG}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::release_tag must be vX.Y.Z, got: ${NEW_TAG:-<empty>}"
+            exit 1
+          fi
           sed -i -E "s|claude-skills#v[0-9]+\.[0-9]+\.[0-9]+|claude-skills#${NEW_TAG}|g" README.md
+          if ! grep -q "claude-skills#${NEW_TAG}" README.md; then
+            echo "::error::README.md had no claude-skills#vX.Y.Z install refs to sync to ${NEW_TAG}"
+            exit 1
+          fi
 
       - name: Commit bump + annotated tag on exact SHA
         if: steps.plan.outputs.action == 'bump_and_tag'
@@ -97,7 +105,10 @@ jobs:
             exit 1
           fi
 
-          git add package.json package-lock.json README.md
+          git add package.json package-lock.json
+          if ! git diff --quiet -- README.md; then
+            git add README.md
+          fi
           git commit -m "chore(release): v${VER}"
           BUMP_SHA="$(git rev-parse HEAD)"
 
@@ -167,5 +178,4 @@ jobs:
           git tag -a "$TAG" -m "$TAG" "$SHA"
           git push origin "refs/tags/${TAG}"
           echo "Tagged $TAG at $SHA (${{ steps.plan.outputs.reason }})"
-          echo "Reminder: tag_only path (manual major/minor) does not auto-rewrite README. Update README install refs in the upcoming PR or run:"
-          echo "  node scripts/release-version.mjs readme-sync <prevTag> ${TAG}"
+          echo "Reminder: tag_only path (manual major/minor) does not auto-rewrite README. Update README install refs to #${TAG} in the originating PR."
