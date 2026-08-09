@@ -22,7 +22,8 @@
     "uninstall-ui": "node bin/cli.js uninstall",
     "test:installer": "node --test tests/test_installer_core.mjs",
     "release:plan": "node scripts/release-version.mjs plan",
-    "release:write": "node scripts/release-version.mjs write"
+    "release:write": "node scripts/release-version.mjs write",
+    "release:readme": "node scripts/release-version.mjs readme-sync"
   },
   "repository": {
     "type": "git",
