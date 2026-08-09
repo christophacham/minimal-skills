@@ -75,7 +75,7 @@ docs/                      # installer pattern essay
 | Group | Default in cart? | Contents |
 |-------|------------------|----------|
 | **SEARCH** | yes | `ddg-search`, `brave-search`, `tavily-search` (**bodies frozen** — see ban) |
-| **CORE** | yes | `simple-design`, `refactoring` |
+| **CORE** | yes | `simple-design`, `refactoring`, `repo-discovery` |
 | **OPT_IN** | no | `architecture-design`, `distributed-architecture`, `geometric-robustness` |
 | **SECURITY** | no | `defectdojo-fix` |
 | **SPECIALIST** | no | `ink-cli-tui` |

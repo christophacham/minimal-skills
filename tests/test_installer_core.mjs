@@ -71,6 +71,7 @@ describe('catalog groups', () => {
     const d = new Set(defaultSelectedSkillIds());
     assert.ok(d.has('simple-design'));
     assert.ok(d.has('refactoring'));
+    assert.ok(d.has('repo-discovery'));
     assert.ok(d.has('ddg-search'));
     assert.ok(d.has('brave-search'));
     assert.ok(d.has('tavily-search'));
@@ -79,7 +80,7 @@ describe('catalog groups', () => {
     assert.ok(!d.has('ink-cli-tui'));
   });
 
-  it('known suite is the ten kept skills', () => {
+  it('known suite is the eleven kept skills', () => {
     assert.deepEqual(
       [...known].sort(),
       [
@@ -91,6 +92,7 @@ describe('catalog groups', () => {
         'geometric-robustness',
         'ink-cli-tui',
         'refactoring',
+        'repo-discovery',
         'simple-design',
         'tavily-search',
       ],
