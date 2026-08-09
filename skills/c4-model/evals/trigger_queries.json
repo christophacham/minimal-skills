@@ -1,0 +1,18 @@
+[
+  {
+    "query": "Draw a C4 container diagram for this service and how it talks to the billing system.",
+    "should_trigger": true
+  },
+  {
+    "query": "Should checkout and inventory be one deployable or two microservices with separate databases?",
+    "should_trigger": false
+  },
+  {
+    "query": "Where should the Order entity and SubmitOrder use case live in Clean Architecture?",
+    "should_trigger": false
+  },
+  {
+    "query": "Our architecture diagram is unlabeled boxes and arrows — fix it with C4 context and containers.",
+    "should_trigger": true
+  }
+]

@@ -81,13 +81,14 @@ describe('catalog groups', () => {
     assert.ok(!d.has('ink-cli-tui'));
   });
 
-  it('known suite is the twelve kept skills', () => {
+  it('known suite is the thirteen kept skills', () => {
     assert.deepEqual(
       [...known].sort(),
       [
         'architecture-design',
         'arxiv-prior-art',
         'brave-search',
+        'c4-model',
         'ddg-search',
         'defectdojo-fix',
         'distributed-architecture',
