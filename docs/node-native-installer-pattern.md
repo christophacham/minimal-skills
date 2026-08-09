@@ -70,7 +70,7 @@ apply      = applyPlan(plan, desired)        // sole mutator
 
 1. **SEARCH** — default-selected in a fresh cart  
 2. **CORE** — default-selected (`simple-design`, `refactoring`)  
-3. **OPT_IN** — offer only (architecture / distributed / geometry)  
+3. **OPT_IN** — offer only (architecture / distributed / geometry / c4 / arxiv)  
 4. **SECURITY** — offer only (vuln trackers; e.g. `defectdojo-fix`)  
 5. **SPECIALIST** — offer only (narrow load-on-demand; e.g. `ink-cli-tui`)  
 

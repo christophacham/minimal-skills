@@ -1,0 +1,39 @@
+{
+  "skill_name": "c4-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Document our Internet Banking product: customers use a SPA, a Java API talks to a Core Banking System and a MySQL accounts schema, statements land in S3. Draw the right C4 diagrams for onboarding engineers.",
+      "expected_output": "System Context plus Container diagrams with people, external systems, containers (SPA, API, MySQL schema, S3), labeled unidirectional relationships with protocols, technologies on containers, and no K8s/deployment clutter on the container view.",
+      "files": [],
+      "expectations": [
+        "Produces a System Context and a Container view with explicit titles and scope.",
+        "Models applications and data stores as C4 containers with technology and responsibilities.",
+        "Labels relationships with intent and inter-process technology; uses unidirectional arrows.",
+        "Keeps deployment infrastructure off the container diagram."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We have three microservices each with an API and Postgres schema. One team owns all of them in one repo. How should we C4-model this, and what changes if we split into three teams?",
+      "expected_output": "While one team owns them: one software system with each service as a group of containers. After team split: each service becomes a software system; callers keep neighbors opaque rather than drawing cross-system container internals.",
+      "files": [],
+      "expectations": [
+        "Does not model a microservice as a single container with combined API+database technology.",
+        "Chooses grouping-of-containers vs software-system based on ownership.",
+        "Warns against opening other teams' systems on a container diagram."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Critique this architecture slide: blue and green boxes, unlabeled arrows both ways, a box called business logic, Kubernetes pods drawn on the same picture as 'logical components', no title or key.",
+      "expected_output": "Structured critique against C4 quality rules with concrete fixes: title/scope, element type+description+tech, unidirectional labeled arrows, separate deployment view, diagram key, rename generic boxes.",
+      "files": [],
+      "expectations": [
+        "Flags missing title, key, labels, and mixed abstraction/deployment levels.",
+        "Requires unidirectional arrows whose text matches direction.",
+        "Separates container (logical runtime apps/data) from deployment topology."
+      ]
+    }
+  ]
+}
