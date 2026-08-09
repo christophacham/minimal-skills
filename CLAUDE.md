@@ -76,7 +76,7 @@ docs/                      # installer pattern essay
 |-------|------------------|----------|
 | **SEARCH** | yes | `ddg-search`, `brave-search`, `tavily-search` (**bodies frozen** — see ban) |
 | **CORE** | yes | `simple-design`, `refactoring`, `repo-discovery` |
-| **OPT_IN** | no | `architecture-design`, `distributed-architecture`, `geometric-robustness` |
+| **OPT_IN** | no | `architecture-design`, `distributed-architecture`, `geometric-robustness`, `arxiv-prior-art` |
 | **SECURITY** | no | `defectdojo-fix` |
 | **SPECIALIST** | no | `ink-cli-tui` |
 
