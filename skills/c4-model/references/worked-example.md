@@ -79,15 +79,15 @@ flowchart TB
       SEC["Security Component<br/>[Component: Spring bean]<br/>Validates credentials and session tokens"]
       EMAIL["E-mail Component<br/>[Component: Spring bean]<br/>Sends e-mail for MFA and fraud alerts"]
       CBSA["Core Banking System Adapter<br/>[Component: Spring bean]<br/>Translates between our domain and the CBS XML API"]
-      SIA --> SEC
-      SIA --> EMAIL
-      ASA --> SEC
-      ASA --> CBSA
-      STA --> SEC
-      STA --> CBSA
-      PAY --> SEC
-      PAY --> CBSA
-      PAY --> EMAIL
+      SIA -->|"Validates credentials via"| SEC
+      SIA -->|"Sends MFA e-mail via"| EMAIL
+      ASA -->|"Validates session via"| SEC
+      ASA -->|"Fetches accounts via"| CBSA
+      STA -->|"Validates session via"| SEC
+      STA -->|"Fetches statement data via"| CBSA
+      PAY -->|"Validates session via"| SEC
+      PAY -->|"Makes payments via"| CBSA
+      PAY -->|"Sends fraud alerts via"| EMAIL
     end
     DB[("Database<br/>[Container: MySQL schema]")]
     SS[("Statement Store<br/>[Container: Amazon S3 bucket]")]
@@ -198,9 +198,9 @@ flowchart TB
       Browser --- UI
       SC -->|"Serves static files to [HTTP]"| Browser
       UI -->|"Makes API calls to [HTTP localhost:8080]"| BE
-      BE --> DB
-      BE --> SS
-      BE --> SES
+      BE -->|"Reads from and writes to [SQL/TCP]"| DB
+      BE -->|"Reads from and writes to [S3 API]"| SS
+      BE -->|"Sends e-mail using"| SES
     end
     CBS["Core Banking System, dev instance on corebanking-dev [Software System instance]"]
     BE -->|"Makes API calls to [XML/HTTPS]"| CBS
@@ -236,19 +236,19 @@ flowchart TB
     end
     SS[("Statement Store, S3 bucket [Container instance]")]
     SES["E-mail System [Software System instance: Amazon SES]"]
-    ALB --> BE
-    BE --> DB
-    BE --> SS
-    BE --> SES
+    ALB -->|"Forwards API requests to [HTTPS]"| BE
+    BE -->|"Reads from and writes to [SQL/TCP]"| DB
+    BE -->|"Reads from and writes to [S3 API/HTTPS]"| SS
+    BE -->|"Sends e-mail using [SMTP/HTTPS API]"| SES
   end
   subgraph Bank["Bank data center [Organizational boundary]"]
     CBS["Core Banking System on corebanking-live [Software System instance]"]
   end
-  Cust --> Browser
-  DNS1 --> S3Static
+  Cust -->|"Accesses the internet banking site using"| Browser
+  DNS1 -->|"Aliases, proxied and cached"| S3Static
   Browser -->|"Loads app from [HTTPS]"| DNS1
   UI -->|"Makes API calls to [JSON/HTTPS]"| DNS2
-  DNS2 --> ALB
+  DNS2 -->|"Aliases, not proxied"| ALB
   BE -->|"Makes API calls to [XML/HTTPS via AWS Direct Connect]"| CBS
 ```
 
