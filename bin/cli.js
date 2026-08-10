@@ -2,8 +2,8 @@
 /**
  * Selective interactive installer for claude-skills.
  *
- *   npx -y github:christophacham/claude-skills#v1.0.0   # full-screen Ink wizard
- *   bunx github:christophacham/claude-skills#v1.0.0
+ *   npx -y github:christophacham/claude-skills#vX.Y.Z   # full-screen Ink wizard
+ *   bunx github:christophacham/claude-skills#vX.Y.Z
  *   node bin/cli.js
  *   node bin/cli.js install                      # same as wizard
  *   node bin/cli.js uninstall [--yes]

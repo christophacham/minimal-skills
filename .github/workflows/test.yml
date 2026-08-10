@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run tests with stock macOS Bash and BSD tools
+      - name: Run suite contracts on macOS
         run: python -m unittest discover -s tests -p 'test_*.py'
 
   windows-powershell:
@@ -45,6 +45,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run tests in PowerShell
+      - name: Run suite contracts on Windows
         shell: pwsh
         run: python -m unittest discover -s tests -p 'test_*.py'
