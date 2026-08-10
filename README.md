@@ -86,7 +86,15 @@ Defaults on a fresh project (nothing installed yet):
 | Selection seed | **CORE + SEARCH** (cart only — not on disk until Apply) |
 | Opt-in / Security / Specialist | off until you select them |
 
-If the active scope already has suite skills on disk, selection seeds from the scan instead.
+If the active scope already has suite skills on disk, **targets and selection** seed from the scan (including the `.agents/skills` mirror when present) so startup is **in sync** — no spurious −remove pending.
+
+**Startup gate (project only):** when the project already has suite skills under `.claude/skills` and/or `.agents/skills`, the wizard asks first:
+
+1. **Update and continue** — overwrite those project skill dirs from this package, then open the menu  
+2. **Update and exit** — same overwrite, then quit  
+3. **Continue without updating** — leave disk as-is and open the menu  
+
+Global installs are never touched by this prompt.
 
 **Main menu** (workflow order — place → pick → review → write):
 
@@ -114,8 +122,9 @@ Claude skill dirs are a full **copy** from the package. The `.agents/skills` mir
 
 ### Apply model
 
-Selection is an in-memory **cart**. Nothing is written until **Apply changes**.
+Selection is an in-memory **cart**. Aside from the optional **startup project refresh**, nothing is written until **Apply changes**.
 
+- **Startup project refresh** (when project skills already exist) — overwrite project skill dirs only, then continue or exit  
 - Select skills → **Apply** → installs the pending `+` set for the active scope/targets  
 - Deselect skills → **Apply** → removes the pending `−` set (project uninstall)  
 - Cancel / Exit with pending changes → cart discarded; disk unchanged  
