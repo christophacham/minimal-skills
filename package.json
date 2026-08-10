@@ -1,6 +1,6 @@
 {
   "name": "claude-skills",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Selective interactive installer for the claude-skills suite (Claude Code skills)",
   "type": "module",
   "bin": {
