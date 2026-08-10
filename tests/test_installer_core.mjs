@@ -21,12 +21,20 @@ import {
   planIsEmpty,
   planCounts,
   summarizePlan,
+  treesFromInstalled,
+  resyncFromInstalled,
 } from '../lib/desired.js';
 import { allSkillIds, defaultSelectedSkillIds, SKILL_GROUPS } from '../lib/catalog.js';
 import { scanAllInstalled, isInstalled, skillStatus } from '../lib/scan.js';
 import { applyPlan } from '../lib/apply.js';
 import { installSkillToTree, removeSkillFromTree, trySymlink } from '../lib/fs-ops.js';
 import { skillsDestForTree } from '../lib/paths.js';
+import {
+  projectSkillPlacements,
+  uniqueProjectSkillIds,
+  projectHasInstalledSkills,
+  refreshProjectSkills,
+} from '../lib/project-refresh.js';
 import {
   suiteVersion,
   releaseGitRef,
@@ -173,9 +181,90 @@ describe('desired planChanges', () => {
       },
     ];
     const plan = planChanges(state, installed);
-    const rem = plan.skillOps.filter((o) => o.op === 'remove');
-    assert.equal(rem.length, 1);
-    assert.equal(rem[0].tree, 'agents');
+    assert.ok(plan.skillOps.some((o) => o.op === 'remove' && o.tree === 'agents'));
+  });
+
+  it('seeds trees+selected from disk so agents mirror is in sync on startup', () => {
+    const installed = [
+      {
+        id: 'refactoring',
+        scope: 'project',
+        tree: 'claude',
+        path: '/c',
+        kind: 'dir',
+      },
+      {
+        id: 'refactoring',
+        scope: 'project',
+        tree: 'agents',
+        path: '/a',
+        kind: 'symlink',
+      },
+      {
+        id: 'simple-design',
+        scope: 'project',
+        tree: 'claude',
+        path: '/c2',
+        kind: 'dir',
+      },
+      {
+        id: 'simple-design',
+        scope: 'project',
+        tree: 'agents',
+        path: '/a2',
+        kind: 'symlink',
+      },
+    ];
+    const state = createDesiredState({
+      projectRoot: '/tmp/proj',
+      scope: 'project',
+      seedFromInstalled: installed,
+    });
+    assert.deepEqual(state.trees, ['claude', 'agents']);
+    assert.deepEqual([...state.selected].sort(), ['refactoring', 'simple-design']);
+    assert.equal(planIsEmpty(planChanges(state, installed)), true);
+  });
+
+  it('treesFromInstalled stays claude-only when no agents placements', () => {
+    const installed = [
+      {
+        id: 'refactoring',
+        scope: 'project',
+        tree: 'claude',
+        path: '/c',
+        kind: 'dir',
+      },
+    ];
+    assert.deepEqual(treesFromInstalled(installed, 'project'), ['claude']);
+  });
+
+  it('resyncFromInstalled restores trees and selected from disk', () => {
+    const installed = [
+      {
+        id: 'refactoring',
+        scope: 'project',
+        tree: 'claude',
+        path: '/c',
+        kind: 'dir',
+      },
+      {
+        id: 'refactoring',
+        scope: 'project',
+        tree: 'agents',
+        path: '/a',
+        kind: 'symlink',
+      },
+    ];
+    const state = createDesiredState({
+      projectRoot: '/tmp/proj',
+      scope: 'project',
+      trees: ['claude'],
+      selected: [],
+    });
+    resyncFromInstalled(state, installed);
+    assert.deepEqual(state.trees, ['claude', 'agents']);
+    assert.ok(state.selected.has('refactoring'));
+    assert.equal(planIsEmpty(planChanges(state, installed)), true);
   });
 
   it('suite skills never pull agent roster', () => {
@@ -472,6 +561,72 @@ describe('installSkillToTree direct', () => {
       assert.ok(
         !existsSync(join(skillsDestForTree('claude', 'project', projectRoot), 'refactoring')),
       );
+    } finally {
+      rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('project refresh (overwrite existing project skills)', () => {
+  it('detects project placements and ignores global', () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref-'));
+    try {
+      assert.equal(projectHasInstalledSkills(projectRoot), false);
+      installSkillToTree('simple-design', 'claude', 'project', projectRoot);
+      installSkillToTree('refactoring', 'claude', 'project', projectRoot);
+      const installed = scanAllInstalled(projectRoot);
+      assert.deepEqual(uniqueProjectSkillIds(installed), [
+        'refactoring',
+        'simple-design',
+      ]);
+      assert.equal(projectSkillPlacements(installed).every((p) => p.scope === 'project'), true);
+      assert.equal(projectHasInstalledSkills(projectRoot), true);
+    } finally {
+      rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('overwrites stale project skill content from package', () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref2-'));
+    try {
+      const dest = join(
+        skillsDestForTree('claude', 'project', projectRoot),
+        'simple-design',
+      );
+      mkdirSync(dest, { recursive: true });
+      writeFileSync(join(dest, 'SKILL.md'), '# stale local copy\n');
+      writeFileSync(join(dest, 'STALE_MARKER.txt'), 'old');
+
+      const result = refreshProjectSkills(projectRoot, { skipDeps: true });
+      assert.ok(result.refreshed.includes('simple-design@claude'));
+      assert.equal(result.errors.length, 0);
+      assert.equal(result.version, packageVersion);
+      assert.ok(existsSync(join(dest, 'SKILL.md')));
+      assert.ok(!existsSync(join(dest, 'STALE_MARKER.txt')));
+      const body = readFileSync(join(dest, 'SKILL.md'), 'utf8');
+      assert.ok(!body.includes('stale local copy'));
+      assert.match(body, /simple-design|Simple Design|simple design/i);
+    } finally {
+      rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  it('refreshes both claude and agents trees in project only', () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref3-'));
+    try {
+      installSkillToTree('refactoring', 'claude', 'project', projectRoot);
+      installSkillToTree('refactoring', 'agents', 'project', projectRoot);
+      const claudeDest = join(
+        skillsDestForTree('claude', 'project', projectRoot),
+        'refactoring',
+      );
+      writeFileSync(join(claudeDest, 'STALE.txt'), 'x');
+
+      const result = refreshProjectSkills(projectRoot, { skipDeps: true });
+      assert.ok(result.refreshed.includes('refactoring@claude'));
+      assert.ok(result.refreshed.includes('refactoring@agents'));
+      assert.ok(!existsSync(join(claudeDest, 'STALE.txt')));
+      assert.ok(existsSync(join(claudeDest, 'SKILL.md')));
     } finally {
       rmSync(projectRoot, { recursive: true, force: true });
     }
