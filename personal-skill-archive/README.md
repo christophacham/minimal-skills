@@ -3,15 +3,16 @@
 **This folder is a preservation archive — not part of the managed skill suite.**
 
 It was copied from `~/.claude/skills/` on 2026-08-05 as a backup before wiping
-the machine. These skills are **not** installed or wired by the Node installer
-(`npx`/`bunx` claude-skills), and they are **not** validated against the suite's standards.
-They are kept here only so nothing is lost.
+the machine. These skills are **not** installed or wired by this repository's
+GitHub-based Node installer (`npx -y github:christophacham/claude-skills#vX.Y.Z`
+or `bunx github:christophacham/claude-skills#vX.Y.Z`), and they are **not**
+validated against the suite's standards. They are kept here only so nothing is lost.
 
 ---
 
 ## Current managed suite
 
-The root [`README.md`](../README.md) is the source of truth for the current managed suite, its agents, installation behavior, and doctrine. This archive intentionally does not duplicate that catalog because archived contents and the active suite evolve independently.
+The root [`README.md`](../README.md) is the source of truth for the current managed skill suite, installation behavior, and doctrine. This archive intentionally does not duplicate that catalog because archived contents and the active suite evolve independently.
 
 ---
 

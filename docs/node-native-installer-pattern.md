@@ -34,15 +34,17 @@ README examples/catalog text.
 claude-skills                      # wizard (default)
 claude-skills wizard
 claude-skills install              # alias of wizard
+claude-skills install --clack      # scrolling Clack wizard
 claude-skills install --legacy     # old linear flow
 claude-skills uninstall [--yes]
 claude-skills --help
 ```
 
-Options: `-p/--project <dir>`, `--skip-deps`, `--legacy`, `-y/--yes`.
+Options: `-p/--project <dir>`, `--skip-deps`, `--clack`, `--legacy`, `-y/--yes`.
 
-No subcommand opens the **menu wizard**. The linear confirm ladder remains only
-behind `--legacy`.
+Running with no subcommand opens the **menu wizard**. `--clack` selects the
+scrolling Clack wizard; the separate linear confirm ladder remains only behind
+`--legacy`.
 
 ## Wizard model (plan-then-apply)
 
@@ -59,17 +61,17 @@ apply      = applyPlan(plan, desired)        // sole mutator
 |---|---|
 | Scope | **project** (`--project` or cwd) |
 | Skill trees | `['claude']` only |
-| Agents tree | off until toggled under Targets |
+| `.agents/skills` mirror | off until toggled under Targets |
 | Claude install | full **copy** from package `skills/<id>` |
-| Agents install | **symlink/junction** to Claude skill dir → **copy** fallback |
-| Agent roster | none (suite does not install agents) |
+| `.agents/skills` install | **symlink/junction** to Claude skill dir → **copy** fallback |
+| Custom agent roster | none (suite installs skills only) |
 | API keys | always `~/.claude/settings.json` |
 | Deps | run against **claude** skill path only |
 
 ### Groups (`lib/catalog.js` → `SKILL_GROUPS`)
 
 1. **SEARCH** — default-selected in a fresh cart  
-2. **CORE** — default-selected (`simple-design`, `refactoring`)  
+2. **CORE** — default-selected (`simple-design`, `refactoring`, `repo-discovery`)
 3. **OPT_IN** — offer only (architecture / distributed / geometry / c4 / arxiv)  
 4. **SECURITY** — offer only (vuln trackers; e.g. `defectdojo-fix`)  
 5. **SPECIALIST** — offer only (narrow load-on-demand; e.g. `ink-cli-tui`)  
@@ -83,7 +85,7 @@ Workflow order (separators in the TUI):
 
 **Scope · Targets · Browse · Status · Apply** · | · **API keys · Manage** · | · **Exit**
 
-Apply is the only path that writes skills/agents/manifest for the wizard.
+Apply is the only path that writes skills; global applies also update the manifest.
 Cancel discards the in-memory cart (no partial mid-menu writes).
 
 ## Placement
@@ -93,14 +95,15 @@ Cancel discards the in-memory cart (no partial mid-menu writes).
 - Claude tree: `~/.claude` or `<project>/.claude`  
 - Agents skill tree: `~/.agents` or `<project>/.agents`  
 - Skill dirs: `<tree-root>/skills/<id>`  
-- Custom agents (coder/reviewer/…): always under Claude tree `.claude/agents`  
+
+The current suite installs skills only. It does not ship or place custom agent files.
 
 ## Manifest and uninstall ownership
 
 The Node installer records only **global** items it installed in
 `~/.claude/claude-skills-manifest.json`. `lib/uninstall-flow.js` removes only
-those recorded global skills/agents/panelists entries, then clears the
-manifest.
+those recorded global entries, then clears the manifest. Current installs add
+skills only; legacy agent/panelist fields remain readable for cleanup compatibility.
 
 There is **no project manifest**. Project uninstall is “deselect + Apply” in the
 wizard for the active project scope/targets.
@@ -117,7 +120,9 @@ Left alone by smart global uninstall:
 |---|---|
 | CLI arguments/help/default command | `bin/cli.js` |
 | Selectable skills and groups | `lib/catalog.js` |
-| Menu wizard | `lib/wizard.js` |
+| Wizard entry / UI selection | `lib/wizard.js` |
+| Full-screen Ink TUI | `lib/tui/run.js`, `lib/tui/App.js` |
+| Scrolling Clack fallback | `lib/wizard-clack.js` |
 | Desired state + pure plan | `lib/desired.js` |
 | Disk scan of installed skills | `lib/scan.js` |
 | Apply plan (sole mutator) | `lib/apply.js` |
@@ -129,6 +134,8 @@ Left alone by smart global uninstall:
 | Dependency setup | `lib/deps.js` |
 | Manifest schema/merge | `lib/manifest.js` |
 | API-key presence/storage | `lib/settings.js` |
+| Suite version / stale-payload gate | `lib/suite-version.js` |
+| Release planning / write path | `lib/release-plan.js`, `scripts/release-version.mjs`, `.github/workflows/release.yml` |
 | Unit tests (no TTY) | `tests/test_installer_core.mjs` |
 
 ## Verification
