@@ -11,6 +11,7 @@ import {
   rmSync,
   existsSync,
   lstatSync,
+  readFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -54,6 +55,9 @@ import {
 } from '../lib/release-plan.js';
 
 const known = allSkillIds();
+const packageVersion = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+).version;
 
 describe('catalog groups', () => {
   it('exposes five groups covering all skill ids', () => {
@@ -79,6 +83,13 @@ describe('catalog groups', () => {
     assert.ok(!d.has('arxiv-prior-art'));
     assert.ok(!d.has('defectdojo-fix'));
     assert.ok(!d.has('ink-cli-tui'));
+  });
+
+  it('group hints name every non-search member they enumerate', () => {
+    const core = SKILL_GROUPS.find((g) => g.id === 'core');
+    const optIn = SKILL_GROUPS.find((g) => g.id === 'opt_in');
+    assert.match(core.hint, /repo-discovery/);
+    assert.match(optIn.hint, /C4/i);
   });
 
   it('known suite is the thirteen kept skills', () => {
@@ -468,12 +479,15 @@ describe('installSkillToTree direct', () => {
 });
 
 describe('suite version + stale payload gate', () => {
-  it('reads package.json version as 1.0.0', () => {
+  it('derives install refs from package.json version', () => {
     _resetSuiteVersionCacheForTests();
-    assert.equal(suiteVersion(), '1.0.0');
-    assert.equal(releaseGitRef(), 'v1.0.0');
-    assert.equal(preferredInstallTag(), 'v1.0.0');
-    assert.equal(installPin(), 'github:christophacham/claude-skills#v1.0.0');
+    assert.equal(suiteVersion(), packageVersion);
+    assert.equal(releaseGitRef(), `v${packageVersion}`);
+    assert.equal(preferredInstallTag(), `v${packageVersion}`);
+    assert.equal(
+      installPin(),
+      `github:christophacham/claude-skills#v${packageVersion}`,
+    );
     assert.equal(FIRST_RELEASE_TAG, 'v1.0.0');
   });
 
@@ -547,8 +561,8 @@ describe('suite version + stale payload gate', () => {
     _resetSuiteVersionCacheForTests();
     const a = suiteVersion();
     const b = suiteVersion();
-    assert.equal(a, '1.0.0');
-    assert.equal(b, '1.0.0');
+    assert.equal(a, packageVersion);
+    assert.equal(b, packageVersion);
   });
 });
 

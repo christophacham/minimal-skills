@@ -73,7 +73,7 @@ node bin/cli.js
 # or: npm run wizard
 ```
 
-No subcommand opens the full-screen wizard. Compat aliases: `wizard`, `install` (same UI). Options: `-p/--project <dir>`, `--skip-deps`, `--clack` (scrolling Clack UI), `--legacy` (old linear ladder), `-y/--yes` (uninstall only).
+Running with no subcommand opens the full-screen wizard. Compat aliases: `wizard`, `install` (same UI). Options: `-p/--project <dir>`, `--skip-deps`, `--clack` (scrolling Clack UI), `--legacy` (old linear ladder), `-y/--yes` (uninstall only).
 
 ### What the wizard does
 
@@ -150,7 +150,7 @@ Tracked global uninstall does **not** touch project installs, API keys, or npm/P
 
 ## Bundled Skills
 
-Catalog groups (selective Node installer): **SEARCH** · **CORE** (default-yes) · **OPT_IN** · **SECURITY** · **SPECIALIST** (OPT_IN + SECURITY + SPECIALIST: offer, never default-yes).
+Catalog groups (selective Node installer): **SEARCH** + **CORE** (default-yes) · **OPT_IN** · **SECURITY** · **SPECIALIST** (OPT_IN + SECURITY + SPECIALIST: offer, never default-yes).
 
 ### SEARCH
 - **`ddg-search`**: Free web/news search via `ddgs` (no API key). Always forks into an Explore subagent.
