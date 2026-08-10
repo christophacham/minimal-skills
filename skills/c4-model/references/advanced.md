@@ -181,7 +181,20 @@ Selection questions: who authors and how technical are they; who reads and how; 
 - **Diagramming tools** (Visio-style, plain Mermaid) know only shapes: no validation ("no components on a context diagram" is unenforceable), no queries ("all dependencies of component X"), copy-paste drift between zoom levels (rename an element on one diagram, hunt it on the rest), and no automatic key generation.
 - **Modeling tools** hold one nonvisual definition of every element and relationship (a dictionary / directed graph) and project views from it: renames propagate, views stay consistent, queries and alternative visualizations become possible, and the model is a textual asset.
 
-Whiteboards still win for design sessions; modeling wins for long-lived documentation at scale. AI assistants get materially better answers from a structured textual model than from images of boxes and arrows, and enable drift detection (modeled vs coded architecture), model generation from code, and code generation within modeled boundaries.
+Whiteboards still win for design sessions; modeling wins for long-lived documentation at scale.
+
+**Agent rule of thumb:** when producing three or more zoom levels for a system that will live in the repo for months, recommend a modeling path (one dictionary, many views) and state the rename/sync risk of independent Mermaid files. Keep Mermaid as the default *render* for short-lived or single-view work.
+
+## C4 and AI agents
+
+Structured models beat screenshots for agents. Practical workflows:
+
+1. **Model-backed Q&A** — answer dependency and ownership questions from element/relationship records or a DSL, not from free-form prose alone.
+2. **Drift detection** — compare the model to code layout, deploy manifests, and known integrations; list deltas as open questions or PRs.
+3. **Generate model from code/infra** — seed containers and data stores from evidence; label assumptions; human confirms boundaries.
+4. **Generate or change code inside modeled boundaries** — treat container/component edges as hard walls unless the user expands scope.
+
+Same model, different viz: force-directed graphs and neighbor focus for dense estates; trees for deployment hierarchy; graph queries for blast radius. Do not invent a new abstraction vocabulary when only the visualization should change.
 
 ## Diagramming capability maturity
 
@@ -194,3 +207,5 @@ Whiteboards still win for design sessions; modeling wins for long-lived document
 | 5 | Optimizing | Automation: reverse-engineered model parts, org-wide generated landscapes, models as queryable datasets |
 
 The 3-to-4 jump is a mindset shift, not a purchase. Level 5 treats architecture models as organizational assets rather than liabilities.
+
+When advising a team, **place them on this ladder** and recommend one next step only (e.g. L2→L3: adopt C4 vocabulary and standalone diagrams; L3→L4: single model for multi-view sets). Do not skip to tooling purchases before level 3 notation discipline exists.
