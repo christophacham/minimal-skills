@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -21,6 +22,7 @@ class SuiteShapeTests(unittest.TestCase):
             "beads-om",
             "beads",
             "skill-creator",
+            "peek-repo",
         ):
             self.assertFalse(
                 (SKILLS / gone).exists(),
@@ -88,6 +90,28 @@ class SuiteShapeTests(unittest.TestCase):
         self.assertIn("`architecture-design`", readme)
         self.assertIn("`refactoring`", readme)
         self.assertIn("`repo-discovery`", readme)
+
+    def test_agent_maps_stay_mirrored_and_use_generic_release_tags(self) -> None:
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+        self.assertEqual(agents.splitlines()[1:], claude.splitlines()[1:])
+
+        cli = (ROOT / "bin" / "cli.js").read_text(encoding="utf-8")
+        documents = (
+            ("AGENTS.md", agents),
+            ("CLAUDE.md", claude),
+            ("bin/cli.js", cli),
+        )
+        for path, text in documents:
+            self.assertIn("claude-skills#vX.Y.Z", text, path)
+            self.assertIsNone(
+                re.search(r"github:christophacham/claude-skills#v\d+\.\d+\.\d+", text),
+                f"{path} must not pin a concrete release",
+            )
+
+    def test_readme_marks_search_and_core_as_defaults(self) -> None:
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("**SEARCH** + **CORE** (default-yes)", readme)
 
     def test_slim_and_om_handbooks_are_gone(self) -> None:
         self.assertFalse((ROOT / "SLIM.md").exists())

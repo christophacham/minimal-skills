@@ -18,7 +18,7 @@ Model after **ccstatusline** (Ink + clear screen + sticky header) and this suite
 
 ## Decision rules
 
-- **Default stack:** Node ≥18 ESM + **React 18** + **Ink 5** as **runtime** dependencies (so `npx github:…` installs them). Do not put Ink only in devDependencies unless you **bundle** a single bin (ccstatusline/Bun build).
+- **Default stack:** Node ≥20 ESM + **React 18** + **Ink 5** as **runtime** dependencies (so `npx github:…` installs them). Do not put Ink only in devDependencies unless you **bundle** a single bin (ccstatusline/Bun build).
 - **Prefer full-screen Ink** for multi-screen wizards (installers, configurators). Use **Clack** only for short linear confirm ladders.
 - **Plan-then-apply:** mutate an in-memory draft (cart/settings); **one** apply path writes disk. Sticky header always shows pending diff.
 - **Pure core outside React:** `scan` / `desired` / `plan` / `apply` as plain modules; TUI only calls them. Enables `node --test` without a TTY.
