@@ -89,8 +89,10 @@ Adding a skill: `skills/<id>/` + entry in the right group in `lib/catalog.js` + 
 
 - **Default UI:** full-screen **Ink** TUI (clear screen, sticky plan header, redraw in place) — not a scrolling Clack log.
 - **Menu order (workflow):** Scope → Targets → Browse → Status → Apply · | · API keys · Manage · | · Exit.
-- **Defaults:** scope **project**; target **`.claude/skills`** only; optional **`.agents/skills`** mirror (symlink → copy).
-- **Plan-then-apply:** selection is a cart; Apply is the sole mutator for skills/manifest.
+- **Defaults:** scope **project**; target **`.claude/skills`** only (unless disk already has `.agents/skills` — then both trees seed active); optional **`.agents/skills`** mirror (symlink → copy).
+- **Plan-then-apply:** selection is a cart; Apply writes the cart. Startup may also **refresh project** skills (see next).
+- **Startup cart sync:** trees + selected seed from disk for the active scope so existing installs start **in sync** (no spurious −remove).
+- **Startup project refresh:** if project already has suite skills, prompt before the menu: update+continue, update+exit, or continue without updating (project only; never global).
 - **Cross-scope guard:** same skill **name** already in the other scope (project ↔ global) → **install blocked** with clear warnings; removes in the active scope still work.
 - **Keys:** Brave/Tavily/DefectDojo only in `~/.claude/settings.json` (never project tree).
 - **Global uninstall:** tracked only via `~/.claude/claude-skills-manifest.json` (`uninstall` / Manage).
