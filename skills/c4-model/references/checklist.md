@@ -41,9 +41,6 @@ Use when critiquing an existing diagram or self-reviewing before publishing. Ans
 - [ ] Are element names identical across zoom levels?
 - [ ] Is the reading order obvious (context to container to component)?
 - [ ] Is the transition between diagrams clear (the box you zoom into on one diagram is the boundary on the next)?
-- [ ] For long-lived multi-view sets: is there a single source of truth (model / diagrams-as-code) rather than copy-pasted shapes that will drift on rename?
-- [ ] Optional durable-doc metadata: maintained by + update-when triggers present and plausible?
-- [ ] Process smell check: are diagram levels treated as zoom levels, not as BA/architect/engineer role gates?
 
 ## Element text template
 
@@ -68,5 +65,3 @@ Types written as `[Person]`, `[Software System]`, `[Container: Java and Spring B
 | Onboarding | Context + Container; one Component for the main app |
 | Message/event redesign | Container with queues/topics as data stores; optional Dynamic for one critical path |
 | Threat modeling / review board | Container + production Deployment, protocols and data stores explicit |
-| First maps / no existing diagrams | 30 min Context only; hang/wiki; Container only if useful |
-| AI / agent shared context | Element+relationship records or modeling DSL; Context + Container minimum |
