@@ -1,6 +1,6 @@
 ---
 name: c4-model
-description: "Visualize and communicate software architecture with the C4 model (context, containers, components, code + dynamic, deployment, landscape). Use when drawing architecture diagrams, documenting system structure, onboarding maps of a codebase, critiquing boxes-and-arrows diagrams, modeling microservices or message-driven topologies, or producing deployment topology views. Not for Clean Architecture layer placement, module API depth, service-split trade-offs, ERDs, state machines, or enterprise-architecture business layers."
+description: "Visualize and communicate software architecture with the C4 model (context, containers, components, code + dynamic, deployment, landscape). Use when drawing architecture diagrams, documenting system structure, onboarding maps of a codebase, critiquing boxes-and-arrows diagrams, modeling microservices or message-driven topologies, producing deployment topology views, or building shared architecture context for humans and AI agents. Not for Clean Architecture layer placement, module API depth, service-split trade-offs, ERDs, state machines, or enterprise-architecture business layers."
 ---
 
 # C4 Model
@@ -12,6 +12,10 @@ Maps of your code at successive zoom levels, like Google Maps for a codebase: zo
 **Scope:** one software system under discussion (or one landscape boundary). Prefer evidence from the repo, runtime config, and known integrations over speculation. State assumptions explicitly.
 
 **C4 container is not a Docker container.** A C4 container is an application or data store that must run for the system to work. Say "C4 container" when Docker/K8s is also in the conversation.
+
+## Why C4
+
+C4 creates shared technical context for design reviews, operations, onboarding, maintenance, and AI-assisted work. It is **not a design process** or delivery workflow: its levels are structural zoom levels, not role gates or project stages.
 
 ## Abstractions (fixed vocabulary)
 
@@ -42,7 +46,8 @@ Deep dive with examples of every container kind: `references/abstractions.md`.
 2. **Always:** System Context + Container diagrams for that system. These two age slowly and serve the widest audience.
 3. **When earned:** one Component diagram **per** application container you need to navigate (never for data stores, rarely for tiny services); Deployment diagram **per** environment that differs (at least production); Dynamic diagram only for a few hard/recurring flows; Code only for a critical or confusing component; Landscape when the question is multi-system.
 4. **Notation pass:** title, element text (name/type/tech/description), labeled unidirectional arrows, diagram key, no mixed abstraction levels.
-5. **Review** against `references/checklist.md`.
+5. **Standalone test:** would this diagram still work if pasted into a ticket or wiki page with **no** accompanying prose or meeting narrative? If someone needs "I'll talk you through it," the diagram failed.
+6. **Review** against `references/checklist.md`.
 
 Diagram levels age at different rates: context slowest, code changes every commit. Do not invent a fifth abstraction level casually; prefer grouping boxes (layers, modules, microservice boundaries, org boundaries) around existing elements.
 
@@ -114,11 +119,11 @@ If a design diagram is an unreadable tangle, treat that as **design feedback**: 
 
 When reviewing C4 documentation, do not stop at diagram criticism. Use this evidence-first loop:
 
-1. **Establish authority.** Read the diagrams, nearby architecture prose, repository structure, runtime/build configuration, public interfaces, and representative host entry points. Treat code/config as authority for *what exists*; treat explicit project principles/ADRs as authority for *why*.
+1. **Establish authority.** Read the diagrams, nearby architecture prose, repository structure, runtime/build configuration, public interfaces, and representative host entry points. Treat code/config as primary evidence for *what exists*; treat explicit project principles/ADRs as authority for *why*.
 2. **Build an as-built inventory.** Record people, owned and external systems, runnable applications/data stores, in-process libraries, protocols, deployment nodes, and shipped/unshipped capabilities. Apply the one-process and ownership tests before judging boxes.
 3. **Audit at three levels.** Check:
    - **Factual integrity:** claims, technologies, protocols, UI-visible facts, runtime paths, and deployment status match evidence.
-   - **Abstraction integrity:** no values, DTOs, errors, files, functions, jobs, libraries, or infrastructure are mislabeled as systems/containers/components.
+   - **Abstraction integrity:** values, DTOs, errors, files, and functions are not promoted to systems, containers, or components. Classify jobs, libraries, and infrastructure by runtime and ownership evidence instead of excluding them categorically.
    - **Set integrity:** names, ownership, colors, shapes, line styles, arrow semantics, and zoom transitions agree across every diagram.
 4. **Classify findings.** Separate factual/modeling defects from optional depth. Rank concrete defects first and cite the evidence; do not inflate preferences into errors.
 5. **Repair for altitude, not box count.** Collapse function/file-per-box component diagrams into cohesive responsibilities. Preserve valuable detail in source-to-component matrices, API tables, invariants, limitations, and implementation sketches explicitly labeled below C3. Remove weak diagrams rather than keeping them to satisfy a count.
@@ -127,6 +132,10 @@ When reviewing C4 documentation, do not stop at diagram criticism. Use this evid
 8. **Adversarial final pass.** Re-run `references/checklist.md` after edits and, when tools permit, ask an independent reviewer to find remaining factual, abstraction, consistency, or rendered-readability defects. Fix verified findings and rerun affected checks.
 
 Do not rewrite correct prose merely for style. Preserve honest limitations, evidence dates, completeness matrices, and explicit “not shipped” statements. Never turn configured intent into an as-built deployment claim.
+
+## C4 + agents
+
+Prefer structured textual models over screenshots for agent-assisted Q&A, drift detection, evidence-backed model generation, and code changes constrained to modeled boundaries. Keep assumptions explicit and verify generated architecture claims against repository and runtime evidence.
 
 ## Agent output contract
 
@@ -152,6 +161,16 @@ Relationship:
   to:
   description:   # sentence fragment that matches arrow direction
   technology:    # protocol when inter-process; blank if in-process
+```
+
+### Diagram-set metadata (optional, durable docs)
+
+```text
+Diagram set:
+  system:
+  maintained_by:     # team or role
+  update_when:       # triggers that force a refresh
+  last_reviewed:     # if known
 ```
 
 ### Renderable default
