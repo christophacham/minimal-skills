@@ -24,6 +24,7 @@ class KeptSkillPresenceTests(unittest.TestCase):
             "defectdojo-fix",
             "ink-cli-tui",
             "arxiv-prior-art",
+            "c4-model",
         ):
             text = (SKILLS / skill_id / "SKILL.md").read_text(encoding="utf-8")
             self.assertTrue(text.startswith("---\n"), skill_id)
@@ -89,6 +90,19 @@ class InkCliTuiSkillTests(unittest.TestCase):
         self.assertIn("name: ink-cli-tui", text)
         self.assertIn("Ink", text)
         self.assertNotIn("skill-creator", text)
+
+
+class C4ModelSkillTests(unittest.TestCase):
+    def test_c4_vocabulary_and_recipe(self) -> None:
+        text = (SKILLS / "c4-model" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("name: c4-model", text)
+        lowered = text.lower()
+        self.assertIn("system context", lowered)
+        self.assertIn("container", lowered)
+        self.assertIn("component", lowered)
+        self.assertIn("unidirectional", lowered)
+        self.assertNotIn("`architecture-design`", text)
+        self.assertNotIn("`distributed-architecture`", text)
 
 
 class InstallerDocsTests(unittest.TestCase):

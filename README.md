@@ -167,6 +167,7 @@ Catalog groups (selective Node installer): **SEARCH** · **CORE** (default-yes) 
 - **`distributed-architecture`**: Trade-offs across deployables — granularity, monolith decomposition, data, sagas, contracts.
 - **`geometric-robustness`**: Float/geometry robustness for slicers and CAD/CAM (Rust).
 - **`arxiv-prior-art`**: Check arXiv prior art before committing to non-trivial architecture/algorithms — real fetches, isolated parallel reads, converges on ONE recommended path with citations and pitfalls.
+- **`c4-model`**: C4 model maps of software architecture — context, containers, components, code, plus dynamic/deployment/landscape; notation quality bar and microservice/messaging mapping.
 
 ### SECURITY (offer, never default-yes)
 Vuln-tracker integrations. Need host credentials (env / settings / credentials file); not a substitute for PR security review.
