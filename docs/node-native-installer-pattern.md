@@ -76,8 +76,20 @@ apply      = applyPlan(plan, desired)        // sole mutator
 4. **SECURITY** — offer only (vuln trackers; e.g. `defectdojo-fix`)  
 5. **SPECIALIST** — offer only (narrow load-on-demand; e.g. `ink-cli-tui`)  
 
-Fresh project with nothing installed: seed selected = `defaultSelectedSkillIds()`.
-If the active scope already has suite skills on disk: seed selected from scan.
+Fresh project with nothing installed: seed selected = `defaultSelectedSkillIds()`, trees = `['claude']`.
+If the active scope already has suite skills on disk: seed **trees + selected** from scan
+(`treesFromInstalled` / `resyncFromInstalled`) so an existing `.agents/skills` mirror does not
+show as pending −remove on startup.
+
+**Project refresh gate (before main menu):** when any catalog skill is present under
+**project** scope (`.claude/skills` and/or `.agents/skills`), the wizard prompts:
+
+- Update and continue — `refreshProjectSkills` overwrites those project placements
+  from the running package, then opens the menu  
+- Update and exit — same overwrite, then quit  
+- Continue without updating — no disk change  
+
+Global scope is never modified by this gate (`lib/project-refresh.js`).
 
 ### Main menu
 
@@ -85,7 +97,8 @@ Workflow order (separators in the TUI):
 
 **Scope · Targets · Browse · Status · Apply** · | · **API keys · Manage** · | · **Exit**
 
-Apply is the only path that writes skills; global applies also update the manifest.
+Apply is the main path that writes skills from the cart; global applies also update the manifest.
+The project refresh gate (above) is the only other write path and is project-scope only.
 Cancel discards the in-memory cart (no partial mid-menu writes).
 
 ## Placement
