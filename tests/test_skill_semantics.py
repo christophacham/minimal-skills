@@ -101,6 +101,11 @@ class C4ModelSkillTests(unittest.TestCase):
         self.assertIn("container", lowered)
         self.assertIn("component", lowered)
         self.assertIn("unidirectional", lowered)
+        self.assertIn("standalone", lowered)
+        self.assertIn("not a design process", lowered)
+        self.assertIn("why c4", lowered)
+        self.assertIn("c4 + agents", lowered)
+        self.assertIn("maintained_by", lowered)
         self.assertNotIn("`architecture-design`", text)
         self.assertNotIn("`distributed-architecture`", text)
 
