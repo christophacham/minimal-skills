@@ -9,6 +9,7 @@ Use when critiquing an existing diagram or self-reviewing before publishing. Ans
 - [ ] Do you understand what the diagram's scope is (which system, container, environment, or org boundary)?
 - [ ] Does the diagram have a key describing any non-obvious notation?
 - [ ] Is there exactly one abstraction level on the diagram (no components on a context view, no K8s on a container view)?
+- [ ] **Standalone test:** would this still work if pasted into a ticket or wiki page with no prose or live walkthrough?
 
 ## Elements
 
