@@ -1,6 +1,6 @@
-I'm Theo. You're my agent. We will be working together a lot, so I thought it would be worth introducing myself.
+My name is Christoph. You're my agent. We will be working together a lot, so I thought it would be worth introducing myself.
 
-I'm known for my youtube channel and work on "T3" products (t3.gg, T3 Chat, T3 Code, UploadThing, Ping, etc).
+I work on git repos under the christophacham and NonPlanarSlicer GitHub orgs.
 
 I love to build. I focus on building complex things as simple as possible. I love to find ways to reduce complexity when solving problems.
 
@@ -21,9 +21,16 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 - `any` is the enemy. Inferred types are our friend. Our systems should adapt to changes, instead of requiring changes everywhere.
 - If your TS code looks like a Python dev wrote it, it is bad TS code.
 - Avoid one-line functions that are just casting wrappers.
-- Write TypeScript in ways that Matt Pocock and Theo would be proud of.
-- If not already specified in project, I generally like to use the following tech: Convex, Tailwind, React, Vite, pnpm
-- When building more complex web and react native apps, I like to pull in Zustand, React Query, Tanstack Start, Clerk (or better-auth if selfhosting), and ArkType (or zod if perf isn't an issue)
+
+## Coding preferences (Rust focused)
+
+- `unwrap()` and `expect()` are for prototypes and tests. Library and app code returns `Result` with typed errors (`thiserror`); binaries may use `anyhow`.
+- Let the type system carry the rules: newtypes over bare primitives, enums over booleans, make invalid states unrepresentable.
+- `clone()` to silence the borrow checker is a smell. Rethink ownership or lifetimes first.
+- Prefer iterators over index loops; `iter()`, not `.clone().into_iter()`.
+- `unsafe` needs a comment stating the invariant it upholds. If you can't write the comment, don't write the `unsafe`.
+- Public API docs explain what callers need to know, not how the internals work. `cargo doc` should read clean.
+- Warnings are errors: clippy clean, no `#[allow]` without a reason written next to it.
 
 ## Questions are read-only
 
@@ -44,6 +51,14 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 ## Blast radius
 
 - Never touch production, live databases, or daily-driver build/preview channels unless explicitly told to. When a task is adjacent to any of them, name what you are about to touch before touching it.
+
+## Coding preferences - design and architecture
+
+- Prefer deep modules over small ones: a simple interface that hides real complexity beats many shallow classes, and if a name or comment is hard to write the design is the problem.
+- Refactor in small behavior-preserving steps with tests green between each, and never refactor and add features in the same step.
+- Dependencies point inward toward business policy: domain code knows nothing about I/O, frameworks, or databases, and adapters translate at the boundary.
+- When a primitive carries a business rule, wrap it in a type that refuses invalid construction (`Email`, `Money`), and put invariants on the type that owns the data.
+- Domain logic tests should be pure; use fakes only at boundaries you own, and assert call order only when order is part of the contract.
 
 ## Pull Requests
 
