@@ -26,12 +26,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/christophacham/claude-skills.git"
+    "url": "git+https://github.com/christophacham/minimal-skills.git"
   },
   "bugs": {
-    "url": "https://github.com/christophacham/claude-skills/issues"
+    "url": "https://github.com/christophacham/minimal-skills/issues"
   },
-  "homepage": "https://github.com/christophacham/claude-skills#readme",
+  "homepage": "https://github.com/christophacham/minimal-skills#readme",
   "keywords": [
     "claude-code",
     "skills",

@@ -103,9 +103,9 @@ class SuiteShapeTests(unittest.TestCase):
             ("bin/cli.js", cli),
         )
         for path, text in documents:
-            self.assertIn("claude-skills#vX.Y.Z", text, path)
+            self.assertIn("minimal-skills#vX.Y.Z", text, path)
             self.assertIsNone(
-                re.search(r"github:christophacham/claude-skills#v\d+\.\d+\.\d+", text),
+                re.search(r"github:christophacham/minimal-skills#v\d+\.\d+\.\d+", text),
                 f"{path} must not pin a concrete release",
             )
 
