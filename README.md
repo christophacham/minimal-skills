@@ -1,4 +1,4 @@
-# claude-skills
+# minimal-skills
 
 Selective Claude Code skills: search helpers, simple design, refactoring, repo discovery, architecture craft, DefectDojo ops, and Ink TUI craft — plus a plan-then-apply Node installer.
 
@@ -18,20 +18,20 @@ First release is **`v1.0.0`**. Each merge to `main` auto-tags the next **patch**
 
 ```sh
 # from any project directory — pin a known release
-npx -y github:christophacham/claude-skills#v1.0.14
+npx -y github:christophacham/minimal-skills#v1.0.14
 ```
 
 Same idea with Bun:
 
 ```sh
-bunx github:christophacham/claude-skills#v1.0.14
+bunx github:christophacham/minimal-skills#v1.0.14
 ```
 
 Tip of `main` (always newest commit; may stick in runner caches after merges):
 
 ```sh
-npx -y github:christophacham/claude-skills#main
-bunx github:christophacham/claude-skills#main
+npx -y github:christophacham/minimal-skills#main
+bunx github:christophacham/minimal-skills#main
 ```
 
 If a run still shows retired process skills (pre-suite CORE), the CLI exits with resync instructions. Clear the runner cache once and re-run a **tag**:
@@ -39,16 +39,16 @@ If a run still shows retired process skills (pre-suite CORE), the CLI exits with
 ```sh
 # Bun
 rm -rf ~/.bun/install/cache ~/.bun/install/git /tmp/bunx-*-claude-skills*
-bunx github:christophacham/claude-skills#v1.0.14
+bunx github:christophacham/minimal-skills#v1.0.14
 
 # npm / npx
 npm cache clean --force
-npx -y github:christophacham/claude-skills#v1.0.14
+npx -y github:christophacham/minimal-skills#v1.0.14
 ```
 
 Do **not** use `@latest` / `npx claude-skills@…` — that is npm-registry semantics. This suite is installed from GitHub; the unscoped npm name `claude-skills` is a different package.
 
-Check what you ran: `npx -y github:christophacham/claude-skills#v1.0.14 --version`
+Check what you ran: `npx -y github:christophacham/minimal-skills#v1.0.14 --version`
 
 ### Versioning (DIY — no external version packages)
 
@@ -65,8 +65,8 @@ Local plan (no network write): `npm run release:plan` → `node scripts/release-
 ### From a clone
 
 ```sh
-git clone https://github.com/christophacham/claude-skills.git
-cd claude-skills
+git clone https://github.com/christophacham/minimal-skills.git
+cd minimal-skills
 npm install
 node bin/cli.js
 # or: node bin/cli.js --project /path/to/app
@@ -148,7 +148,7 @@ Use `--skip-deps` to skip npm/pip/uv setup on apply.
 | **Global (tracked)** | Only items recorded in `~/.claude/claude-skills-manifest.json` |
 
 ```sh
-npx -y github:christophacham/claude-skills#v1.0.14 uninstall   # confirm, then remove tracked global items
+npx -y github:christophacham/minimal-skills#v1.0.14 uninstall   # confirm, then remove tracked global items
 node bin/cli.js uninstall --yes                            # no confirm (from a clone)
 # or from Manage installation → Uninstall tracked GLOBAL items
 ```

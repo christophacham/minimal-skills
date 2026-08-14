@@ -641,7 +641,7 @@ describe('suite version + stale payload gate', () => {
     assert.equal(preferredInstallTag(), `v${packageVersion}`);
     assert.equal(
       installPin(),
-      `github:christophacham/claude-skills#v${packageVersion}`,
+      `github:christophacham/minimal-skills#v${packageVersion}`,
     );
     assert.equal(FIRST_RELEASE_TAG, 'v1.0.0');
   });
@@ -671,7 +671,7 @@ describe('suite version + stale payload gate', () => {
       assert.match(msg, /stale suite payload/);
       assert.match(msg, /operating-mode/);
       assert.match(msg, /claims v1\.0\.3/);
-      assert.match(msg, /bunx github:christophacham\/claude-skills#v1\.0\.3/);
+      assert.match(msg, /bunx github:christophacham\/minimal-skills#v1\.0\.3/);
       const floor = formatStaleSuiteMessage({ retired: found, version: '0.0.0' });
       assert.match(floor, /#v1\.0\.0/);
     } finally {

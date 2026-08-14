@@ -4,8 +4,8 @@
 
 It was copied from `~/.claude/skills/` on 2026-08-05 as a backup before wiping
 the machine. These skills are **not** installed or wired by this repository's
-GitHub-based Node installer (`npx -y github:christophacham/claude-skills#vX.Y.Z`
-or `bunx github:christophacham/claude-skills#vX.Y.Z`), and they are **not**
+GitHub-based Node installer (`npx -y github:christophacham/minimal-skills#vX.Y.Z`
+or `bunx github:christophacham/minimal-skills#vX.Y.Z`), and they are **not**
 validated against the suite's standards. They are kept here only so nothing is lost.
 
 ---

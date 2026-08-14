@@ -1,4 +1,4 @@
-# CLAUDE.md — claude-skills
+# CLAUDE.md — minimal-skills
 
 Agent-facing map of this repository. For humans, prefer `README.md`. Installer internals: `docs/node-native-installer-pattern.md`.
 
@@ -28,7 +28,7 @@ Other skills, installers (non-search paths), docs, and tests remain fair game un
 
 ## What this repo is
 
-**claude-skills** is a **Claude Code skill suite** plus a **selective Node installer**.
+**minimal-skills** is a **Claude Code skill suite** plus a **selective Node installer**.
 
 | Layer | Role |
 |-------|------|
@@ -38,8 +38,8 @@ Other skills, installers (non-search paths), docs, and tests remain fair game un
 
 **Not:** a product app, an agent roster distribution, or a bulk “install everything by default” package.
 
-**GitHub:** `https://github.com/christophacham/claude-skills`  
-**Run installer (no clone):** `npx -y github:christophacham/claude-skills#vX.Y.Z` or `bunx github:christophacham/claude-skills#vX.Y.Z` (replace `vX.Y.Z` with a release tag; `#main` may stick in bunx/npx github: caches)
+**GitHub:** `https://github.com/christophacham/minimal-skills`  
+**Run installer (no clone):** `npx -y github:christophacham/minimal-skills#vX.Y.Z` or `bunx github:christophacham/minimal-skills#vX.Y.Z` (replace `vX.Y.Z` with a release tag; `#main` may stick in bunx/npx github: caches)
 **Do not use** `npx claude-skills@latest` — unscoped npm name is a **different** package; `@latest` is not the lever for this GitHub install.  
 **Suite version:** `package.json` / git tag `vX.Y.Z` in lockstep. **Major/minor manual** in a PR; **patch auto** on each merge to `main` via `.github/workflows/release.yml` + `lib/release-plan.js` / `scripts/release-version.mjs` (no external version libs). Loop break: commits prefixed `chore(release):`. Startup refuses pre-slim payloads (`lib/suite-version.js`).
 
