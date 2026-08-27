@@ -1,6 +1,7 @@
 ---
 name: distributed-architecture
 description: "Trade-off-driven design for decisions across deployable units. Use when deciding whether to split or merge services, breaking apart a monolith (assessing decomposability, tactical forking vs component-based decomposition), decomposing databases or assigning table ownership, choosing saga coordination (sync/async, compensated/forward-recovery, orchestrated/choreographed), designing service contracts (strict vs loose, consumer-driven contracts, stamp coupling), or sharing code across services (library vs service vs sidecar vs duplication). Also for trade-off statements, ADRs, and fitness functions. Not for single-application layering, module/interface design, or distributed-systems theory (CAP, consensus protocols)."
+disable-model-invocation: true
 ---
 
 # Distributed Architecture

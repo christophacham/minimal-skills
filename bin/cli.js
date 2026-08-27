@@ -70,8 +70,7 @@ Options:
 Wizard defaults:
   • Full-screen TUI (like ccstatusline) — redraws in place
   • Scope: PROJECT (not global)
-  • Target: .claude/skills only
-  • Optional: .agents/skills mirror (symlink/copy)
+  • Target: .agents/skills
   • Browse by group · sticky plan header · Apply writes disk
 
 Install pin: prefer a release tag (this build: #${releaseGitRef()}). Patches

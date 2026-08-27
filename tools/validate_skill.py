@@ -4,7 +4,7 @@
 Two explicit profiles are supported:
 
 * ``portable`` validates the Agent Skills upload/package surface.
-* ``claude-code`` validates that surface plus Claude Code frontmatter and
+* ``agent`` validates that surface plus agent harness frontmatter and
   load-time shell injection.
 
 The YAML reader intentionally accepts a conservative data-only subset. It does
@@ -32,7 +32,7 @@ PORTABLE_FIELDS = {
     "metadata",
     "allowed-tools",
 }
-CLAUDE_CODE_FIELDS = PORTABLE_FIELDS | {
+AGENT_FIELDS = PORTABLE_FIELDS | {
     "when_to_use",
     "argument-hint",
     "arguments",
@@ -539,7 +539,7 @@ def validate_frontmatter_fields(
     errors: list[dict[str, str]],
     warnings: list[dict[str, str]],
 ) -> tuple[str, str]:
-    allowed = PORTABLE_FIELDS if mode == "portable" else CLAUDE_CODE_FIELDS
+    allowed = PORTABLE_FIELDS if mode == "portable" else AGENT_FIELDS
     for key in sorted(set(fields) - allowed):
         add_issue(errors, f"Unsupported frontmatter field {key!r} in {mode} mode", str(skill_file))
 
@@ -555,13 +555,13 @@ def validate_frontmatter_fields(
             add_issue(errors, "Missing required frontmatter field: description", str(skill_file))
     else:
         if name_value is None:
-            add_issue(warnings, "name omitted; Claude Code uses the skill directory name", str(skill_file))
+            add_issue(warnings, "name omitted; agent harness uses the skill directory name", str(skill_file))
         elif not isinstance(name_value, str) or not name:
             add_issue(errors, "name must be a non-empty string if provided", str(skill_file))
         if description_value is None:
             add_issue(
                 warnings,
-                "description omitted; Claude Code falls back to the first body paragraph",
+                "description omitted; agent harness falls back to the first body paragraph",
                 str(skill_file),
             )
         elif not isinstance(description_value, str) or not description:
@@ -590,10 +590,10 @@ def validate_frontmatter_fields(
                 f"description must be at most 1024 characters; got {len(description)}",
                 str(skill_file),
             )
-        elif mode == "claude-code" and len(description) > 1536:
+        elif mode == "agent" and len(description) > 1536:
             add_issue(
                 warnings,
-                "description exceeds Claude Code's 1,536-character combined listing budget",
+                "description exceeds agent harness's 1,536-character combined listing budget",
                 str(skill_file),
             )
 
@@ -611,7 +611,7 @@ def validate_frontmatter_fields(
         add_issue(errors, "metadata must be a YAML mapping", str(skill_file))
     elif isinstance(fields.get("metadata"), dict):
         metadata = fields["metadata"]
-        reserved = sorted(set(metadata) & CLAUDE_CODE_FIELDS)
+        reserved = sorted(set(metadata) & AGENT_FIELDS)
         if reserved:
             add_issue(
                 errors,
@@ -629,12 +629,12 @@ def validate_frontmatter_fields(
             )
 
     when_to_use = fields.get("when_to_use")
-    if mode == "claude-code" and isinstance(when_to_use, str):
+    if mode == "agent" and isinstance(when_to_use, str):
         combined_length = len(description) + len(when_to_use)
         if combined_length > 1536:
             add_issue(
                 warnings,
-                f"description + when_to_use exceed Claude Code's 1,536-character listing cap; got {combined_length}",
+                f"description + when_to_use exceed agent harness's 1,536-character listing cap; got {combined_length}",
                 str(skill_file),
             )
 
@@ -648,7 +648,7 @@ def validate_frontmatter_fields(
         if duplicates:
             add_issue(errors, f"Duplicate allowed-tools entry/entries: {', '.join(duplicates)}", str(skill_file))
 
-    if mode == "claude-code":
+    if mode == "agent":
         for field in ("when_to_use", "argument-hint", "model", "agent"):
             if field in fields and (not is_string(fields[field]) or not fields[field].strip()):
                 add_issue(errors, f"{field} must be a non-empty string", str(skill_file))
@@ -780,7 +780,7 @@ def audit_injections(
         for line, _, _ in injections:
             add_issue(
                 errors,
-                f"Dynamic shell injection is a Claude Code-only body feature (body line {line})",
+                f"Dynamic shell injection is a agent harness-only body feature (body line {line})",
                 str(skill_file),
             )
         return len(injections)
@@ -790,7 +790,7 @@ def audit_injections(
     if fields.get("shell") is None:
         add_issue(
             warnings,
-            "Skill uses dynamic injection without an explicit shell; Claude Code defaults to bash",
+            "Skill uses dynamic injection without an explicit shell; agent harness defaults to bash",
             str(skill_file),
         )
     for line, command, _ in injections:
@@ -959,11 +959,11 @@ def validate_trigger_queries(
 def validate_skill(
     path: Path,
     allow_name_mismatch: bool = False,
-    mode: str = "claude-code",
+    mode: str = "agent",
 ) -> dict[str, Any]:
     errors: list[dict[str, str]] = []
     warnings: list[dict[str, str]] = []
-    if mode not in {"portable", "claude-code"}:
+    if mode not in {"portable", "agent"}:
         add_issue(errors, f"Unknown validation mode: {mode}")
         path = path.expanduser().resolve()
         return result(path, path, None, mode, errors, warnings, {})
@@ -1108,16 +1108,16 @@ def main(argv: list[str]) -> int:
         epilog=(
             "Examples:\n"
             "  tools/validate_skill.py ~/.agents/skills/my-skill --mode portable --format text\n"
-            "  tools/validate_skill.py .claude/skills/my-skill --mode claude-code --format text"
+            "  tools/validate_skill.py ~/.agents/skills/my-skill --mode agent --format text"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("path", help="Skill directory or SKILL.md file to validate")
     parser.add_argument(
         "--mode",
-        choices=("portable", "claude-code"),
-        default="claude-code",
-        help="Validation profile (default: claude-code)",
+        choices=("portable", "agent"),
+        default="agent",
+        help="Validation profile (default: agent)",
     )
     parser.add_argument(
         "--allow-name-mismatch",

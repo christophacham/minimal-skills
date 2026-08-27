@@ -2,7 +2,7 @@
 # Ensure the Tavily CLI (`tvly`) is on PATH; install via uv/pip if missing.
 #
 # Read-only check with -CheckOnly. Install is idempotent. Does NOT authenticate —
-# needs TAVILY_API_KEY in env / ~/.claude/settings.json, or `tvly login`.
+# needs TAVILY_API_KEY in env / ~/.agents/settings.json, or `tvly login`.
 #
 # Usage:
 #   ./ensure-tvly.sh
@@ -19,7 +19,7 @@ key_state() {
     printf '%s\n' 'env'
     return 0
   fi
-  if [ -n "${HOME:-}" ] && [ -f "$HOME/.claude/settings.json" ]; then
+  if [ -n "${HOME:-}" ] && [ -f "$HOME/.agents/settings.json" ]; then
     py=''
     if command -v python3 >/dev/null 2>&1; then
       py=python3
@@ -27,7 +27,7 @@ key_state() {
       py=python
     fi
     if [ -n "$py" ]; then
-      hit=$("$py" -c 'import json,sys; d=json.load(open(sys.argv[1])); e=d.get("env") or {}; print("1" if e.get("TAVILY_API_KEY") else "0")' "$HOME/.claude/settings.json" 2>/dev/null)
+      hit=$("$py" -c 'import json,sys; d=json.load(open(sys.argv[1])); e=d.get("env") or {}; print("1" if e.get("TAVILY_API_KEY") else "0")' "$HOME/.agents/settings.json" 2>/dev/null)
       if [ "$hit" = "1" ]; then
         printf '%s\n' 'settings'
         return 0

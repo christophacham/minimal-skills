@@ -66,8 +66,8 @@ Selected row: `▶` prefix + cyan/bold; description under the list for the focus
 Users trust wizards that list:
 
 ```text
-+ ~/proj/.claude/skills/foo
-− ~/.claude/skills/bar
++ ~/proj/.agents/skills/foo
+− ~/.agents/skills/bar
 ```
 
 not only “install 2 skills”.

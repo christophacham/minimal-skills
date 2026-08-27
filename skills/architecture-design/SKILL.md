@@ -1,6 +1,7 @@
 ---
 name: architecture-design
 description: "Application-level structure: Clean Architecture layering (domain/application/infrastructure, ports and adapters, use cases, composition root) and dependency direction toward business policy. Use when asking 'where does this code live?', 'which way should application-layer dependencies point?', 'how should I split application packages or crates by architectural responsibility?', when business logic is tangled with I/O and hard to test, or when placing invariants next to the data they protect. Language-agnostic; worked examples in Rust. Not for module/API interface depth, service or monolith splitting, or behavior-preserving refactor mechanics."
+disable-model-invocation: true
 ---
 
 # Architecture Design

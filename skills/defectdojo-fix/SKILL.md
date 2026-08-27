@@ -16,6 +16,7 @@ allowed-tools: >-
   Bash, Read, Edit, Write, Grep, Glob,
   Bash(${CLAUDE_SKILL_DIR}/scripts/list-findings.sh *),
   Bash(${CLAUDE_SKILL_DIR}/scripts/resolve-product.sh *)
+disable-model-invocation: true
 ---
 
 # defectdojo-fix
@@ -61,7 +62,7 @@ _dd_read_key() {
 }
 
 # settings.json env presence only (never print secret values)
-settings_file="${HOME}/.claude/settings.json"
+settings_file="${HOME}/.agents/settings.json"
 py=''
 command -v python3 >/dev/null 2>&1 && py=python3
 [ -z "$py" ] && command -v python >/dev/null 2>&1 && py=python
@@ -253,11 +254,11 @@ Scripts (`scripts/resolve-env.sh`) and this skill resolve config in this order.
 ### Token
 
 1. Env: `DEFECTDOJO_API_TOKEN` (prefer) or bare `API_TOKEN` (legacy alias — avoid if other tools set it)
-2. Claude Code `~/.claude/settings.json` → `env.DEFECTDOJO_API_TOKEN` — **only when the harness has already injected `env` into the process**
+2. the agent harness `~/.agents/settings.json` → `env.DEFECTDOJO_API_TOKEN` — **only when the harness has already injected `env` into the process**
 3. File: `~/.defectdojo-credentials` then `/root/.defectdojo-credentials`
    keys: `DEFECTDOJO_API_TOKEN=` / `API_TOKEN=`
 
-Bundled scripts (`resolve-env.sh`) read **env + credentials file only**. They do **not** parse `settings.json`. Outside Claude Code, put the token in env or the credentials file.
+Bundled scripts (`resolve-env.sh`) read **env + credentials file only**. They do **not** parse `settings.json`. Outside the agent harness, put the token in env or the credentials file.
 
 ### Base URL (host + port)
 
@@ -266,7 +267,7 @@ Prefer one full base URL, or host and port separately:
 1. Env: `DEFECTDOJO_URL` (e.g. `http://192.168.50.179:8080`)
 2. Env: `DEFECTDOJO_HOST` + optional `DEFECTDOJO_PORT` (default **8080**) + optional `DEFECTDOJO_SCHEME` (default **http**)
 3. Same keys in credentials file
-4. Same keys in settings.json `env` — again **only under Claude Code process injection**; scripts do not load settings.json
+4. Same keys in settings.json `env` — again **only under the agent harness process injection**; scripts do not load settings.json
 
 Examples:
 
@@ -291,7 +292,7 @@ DEFECTDOJO_URL=http://192.168.50.179:8080
 # DEFECTDOJO_PORT=8080
 ```
 
-Claude Code (survives restarts; never project tree):
+the agent harness (survives restarts; never project tree):
 
 ```json
 {

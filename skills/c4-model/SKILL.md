@@ -1,6 +1,7 @@
 ---
 name: c4-model
 description: "Visualize and communicate software architecture with the C4 model (context, containers, components, code + dynamic, deployment, landscape). Use when drawing architecture diagrams, documenting system structure, onboarding maps of a codebase, critiquing boxes-and-arrows diagrams, modeling microservices or message-driven topologies, producing deployment topology views, or building shared architecture context for humans and AI agents. Not for Clean Architecture layer placement, module API depth, service-split trade-offs, ERDs, state machines, or enterprise-architecture business layers."
+disable-model-invocation: true
 ---
 
 # C4 Model

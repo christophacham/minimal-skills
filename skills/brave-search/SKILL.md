@@ -18,6 +18,7 @@ allowed-tools: >-
   Bash(node *), Bash(npm *),
   Bash(node "${CLAUDE_SKILL_DIR}/search.js" *),
   Bash(node "${CLAUDE_SKILL_DIR}/content.js" *)
+disable-model-invocation: true
 ---
 
 # brave-search (forked worker)
@@ -71,10 +72,10 @@ If `${CLAUDE_SKILL_DIR}` is empty, use the skill directory that contains
 ## Setup (normally done by install)
 
 `install.ps1` / `install.sh` run `npm install` in this skill dir and prompt for
-`BRAVE_API_KEY` (writes `~/.claude/settings.json` `env`). Non-interactive:
+`BRAVE_API_KEY` (writes `~/.agents/settings.json` `env`). Non-interactive:
 `-BraveApiKey` / `--brave-api-key`. If still blocked: key from
 https://api-dashboard.search.brave.com — `BRAVE_API_KEY` or `BRAVE_SEARCH_API_KEY`
-in settings or shell; then `npm install` here. Restart Claude after setting a key.
+in settings or shell; then `npm install` here. Restart your agent after setting a key.
 
 ## Report (stdout to parent — entire job)
 

@@ -1,22 +1,23 @@
 ---
 name: repo-discovery
 description: >-
-  Analyze a repository and create or update CLAUDE.md so future agents can work
+  Analyze a repository and create or update AGENTS.md so future agents can work
   effectively without trial-and-error. Use when the user asks to discover the
-  codebase, bootstrap agent context, generate or refresh CLAUDE.md, document
+  codebase, bootstrap agent context, generate or refresh AGENTS.md, document
   repo conventions for agents, onboard to an unfamiliar project, or write an
   agent map of commands, architecture, and gotchas. Not for human README
   rewrites, product marketing docs, or inventing conventions that are not in
   the tree.
+disable-model-invocation: true
 ---
 
-# Repo discovery → CLAUDE.md
+# Repo discovery → AGENTS.md
 
-Explore the working tree and write (or improve) **`CLAUDE.md`** at the project
+Explore the working tree and write (or improve) **`AGENTS.md`** at the project
 root: the agent-facing map of how to work here.
 
-**Human docs stay in `README.md`.** Do not replace README with CLAUDE.md, and
-do not dump CLAUDE.md content into README unless the user asks.
+**Human docs stay in `README.md`.** Do not replace README with AGENTS.md, and
+do not dump AGENTS.md content into README unless the user asks.
 
 ## Hard stop — empty tree
 
@@ -46,7 +47,7 @@ codebase:
 ## Progressive disclosure (quality bar)
 
 Agents already read files well. **Obvious** facts they would learn from one
-or two source files are actively harmful in CLAUDE.md — noise that crowds out
+or two source files are actively harmful in AGENTS.md — noise that crowds out
 signal.
 
 Prefer:
@@ -68,7 +69,7 @@ Run these in order. Use tools; do not guess.
 1. **Root inventory** — list top-level files and directories; note monorepo vs
    single package; note primary languages.
 2. **Existing agent/rule files** — only if present, read and reconcile:
-   - `CLAUDE.md` (update in place; do not discard hard no-gos without cause)
+   - `AGENTS.md` (update in place; do not discard hard no-gos without cause)
    - `AGENTS.md`, `agents.md`
    - `.cursor/rules/**`, `.cursorrules`
    - `.github/copilot-instructions.md`
@@ -84,7 +85,7 @@ Run these in order. Use tools; do not guess.
 5. **Representative source** — read a small set of entrypoints, core modules,
    and tests to learn patterns, layering, and control/data flow. Prefer
    breadth of *kinds* of files over reading everything.
-6. **Improve existing CLAUDE.md** — if it exists, treat it as the base: keep
+6. **Improve existing AGENTS.md** — if it exists, treat it as the base: keep
    accurate sections, fix drift, add missing non-obvious items, remove stale
    or invented content.
 
@@ -93,7 +94,7 @@ Run these in order. Use tools; do not guess.
 Use judgment on section order; adapt headings to the repo. Typical useful map:
 
 ```markdown
-# CLAUDE.md — <repo-name>
+# AGENTS.md — <repo-name>
 
 One-line what this repo is (and what it is not).
 
@@ -131,17 +132,17 @@ Omit any section with nothing real to say.
 2. **Prefer paths and commands over prose.** Agents navigate by file paths and
    runnable lines.
 3. **Do not “improve” the product** while discovering — discovery writes
-   CLAUDE.md (and only other files the user explicitly asked to update).
-4. **Search / frozen / banned areas** — if existing CLAUDE.md or rules mark
+   AGENTS.md (and only other files the user explicitly asked to update).
+4. **Search / frozen / banned areas** — if existing AGENTS.md or rules mark
    areas off-limits, preserve those bans verbatim unless the user overrides.
-5. **Secrets** — never copy tokens, keys, or credentials into CLAUDE.md.
-6. **Scope** — default output path is project-root `CLAUDE.md`. Only write a
+5. **Secrets** — never copy tokens, keys, or credentials into AGENTS.md.
+6. **Scope** — default output path is project-root `AGENTS.md`. Only write a
    different agent file if the user names it explicitly.
 
 ## Done criteria
 
 - Empty-tree guard applied when relevant
-- CLAUDE.md created or updated from evidence in the tree
+- AGENTS.md created or updated from evidence in the tree
 - Commands listed are copy-pasteable and verified against config/CI/scripts
 - No invented conventions
 - Non-obvious knowledge prioritized over tour-guide filler

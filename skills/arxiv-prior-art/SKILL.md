@@ -11,6 +11,7 @@ description: >-
   something that exists", or before designing caching, ranking, consensus,
   retrieval, ML, or coordination mechanisms. Skip for CRUD, glue code, or
   when the user already named the approach ("just do X the simple way").
+disable-model-invocation: true
 ---
 
 # arXiv prior art
@@ -156,10 +157,10 @@ when the user asked for a quick scan or the pick is advisory only.
 **Cache resolution (done inside each subagent, not by you).** Each paper's
 full text lives in a scope-following cache dir, keyed by arXiv id:
 
-- This skill installed **globally** (`~/.claude/skills/…`) → cache at
+- This skill installed **globally** (`~/.agents/skills/…`) → cache at
   `~/.cache/arxiv-prior-art/` — shared across all projects.
-- Installed **in the project** (`.claude/skills/…`) → cache at
-  `<project>/.claude/arxiv-prior-art-cache/` — travels with the project.
+- Installed **in the project** (`.agents/skills/…`) → cache at
+  `<project>/.agents/arxiv-prior-art-cache/` — travels with the project.
 
 Derive which case applies from where this SKILL.md actually lives.
 

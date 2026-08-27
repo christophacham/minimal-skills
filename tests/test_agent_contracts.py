@@ -91,15 +91,12 @@ class SuiteShapeTests(unittest.TestCase):
         self.assertIn("`refactoring`", readme)
         self.assertIn("`repo-discovery`", readme)
 
-    def test_agent_maps_stay_mirrored_and_use_generic_release_tags(self) -> None:
+    def test_agent_map_uses_generic_release_tags(self) -> None:
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
-        claude = (ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-        self.assertEqual(agents.splitlines()[1:], claude.splitlines()[1:])
 
         cli = (ROOT / "bin" / "cli.js").read_text(encoding="utf-8")
         documents = (
             ("AGENTS.md", agents),
-            ("CLAUDE.md", claude),
             ("bin/cli.js", cli),
         )
         for path, text in documents:

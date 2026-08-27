@@ -81,7 +81,7 @@ class SkillValidationTests(unittest.TestCase):
                 for token in forbidden:
                     self.assertNotIn(token, command, f"{skill_dir.name}:{line}")
                 self.assertNotIn(
-                    "${CLAUDE_PROJECT_DIR}/.claude/skills",
+                    "${AGENTS_PROJECT_DIR}/.agents/skills",
                     command,
                     f"{skill_dir.name}:{line}",
                 )

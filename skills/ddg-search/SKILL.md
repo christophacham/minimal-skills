@@ -19,6 +19,7 @@ allowed-tools: >-
   PowerShell(${CLAUDE_SKILL_DIR}/scripts/ensure-ddgs.ps1 *),
   Bash(python "${CLAUDE_SKILL_DIR}/scripts/search.py" *),
   Bash(py -3 "${CLAUDE_SKILL_DIR}/scripts/search.py" *)
+disable-model-invocation: true
 ---
 
 # ddg-search (forked worker)
