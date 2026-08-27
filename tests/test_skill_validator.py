@@ -38,7 +38,7 @@ class ValidatorTestCase(unittest.TestCase):
 
 
 class ValidationModeTests(ValidatorTestCase):
-    def test_portable_rejects_claude_code_fields_and_injection(self) -> None:
+    def test_portable_rejects_agent_fields_and_injection(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             skill = self.make_skill(
                 Path(tmp),
@@ -55,9 +55,9 @@ class ValidationModeTests(ValidatorTestCase):
             errors = self.messages(report)
             self.assertIn("Unsupported frontmatter field 'agent'", errors)
             self.assertIn("Unsupported frontmatter field 'context'", errors)
-            self.assertIn("Claude Code-only body feature", errors)
+            self.assertIn("agent harness-only body feature", errors)
 
-    def test_claude_code_accepts_typed_extensions(self) -> None:
+    def test_agent_accepts_typed_extensions(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             skill = self.make_skill(
                 Path(tmp),
@@ -79,17 +79,17 @@ class ValidationModeTests(ValidatorTestCase):
                     "  owner: geometry"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             self.assertTrue(report["ok"], report["errors"])
 
-    def test_portable_requires_identity_but_claude_code_can_derive_it(self) -> None:
+    def test_portable_requires_identity_but_agent_can_derive_it(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             skill = self.make_skill(Path(tmp), frontmatter="license: MIT")
             portable = validator.validate_skill(skill, mode="portable")
-            claude = validator.validate_skill(skill, mode="claude-code")
+            agent_report = validator.validate_skill(skill, mode="agent")
             self.assertFalse(portable["ok"])
-            self.assertTrue(claude["ok"], claude["errors"])
-            warnings = self.messages(claude, "warnings")
+            self.assertTrue(agent_report["ok"], agent_report["errors"])
+            warnings = self.messages(agent_report, "warnings")
             self.assertIn("name omitted", warnings)
             self.assertIn("description omitted", warnings)
 
@@ -148,7 +148,7 @@ class ConservativeYamlTests(ValidatorTestCase):
                     "          command: verify.sh"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             self.assertTrue(report["ok"], report["errors"])
 
     def test_portable_metadata_requires_string_values(self) -> None:
@@ -165,10 +165,10 @@ class ConservativeYamlTests(ValidatorTestCase):
                 ),
             )
             portable = validator.validate_skill(skill, mode="portable")
-            claude = validator.validate_skill(skill, mode="claude-code")
+            agent_report = validator.validate_skill(skill, mode="agent")
             self.assertFalse(portable["ok"])
             self.assertIn("keys and values must all be strings", self.messages(portable))
-            self.assertTrue(claude["ok"], claude["errors"])
+            self.assertTrue(agent_report["ok"], agent_report["errors"])
 
 
 class ExtensionValidationTests(ValidatorTestCase):
@@ -188,7 +188,7 @@ class ExtensionValidationTests(ValidatorTestCase):
                     "hooks: not-a-map"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             errors = self.messages(report)
             self.assertFalse(report["ok"])
             self.assertIn("Duplicate argument name", errors)
@@ -219,7 +219,7 @@ class InjectionAuditTests(ValidatorTestCase):
                     "!`printf '%s\\n' \"$SERVICE_API_KEY\"`\n"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             errors = self.messages(report)
             self.assertFalse(report["ok"])
             self.assertIn("unsafe named argument $target", errors)
@@ -240,7 +240,7 @@ class InjectionAuditTests(ValidatorTestCase):
                 body=(
                     "# Sample\n\n"
                     "```!\n"
-                    "if root=$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel 2>/dev/null); then\n"
+                    "if root=$(git -C \"${AGENTS_PROJECT_DIR}\" rev-parse --show-toplevel 2>/dev/null); then\n"
                     "  printf 'root=%s\\n' \"$root\"\n"
                     "else\n"
                     "  printf '%s\\n' 'git=unavailable'\n"
@@ -248,7 +248,7 @@ class InjectionAuditTests(ValidatorTestCase):
                     "```\n"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             self.assertTrue(report["ok"], report["errors"])
             self.assertEqual(1, report["summary"]["dynamic_injections"])
 
@@ -269,7 +269,7 @@ class InjectionAuditTests(ValidatorTestCase):
                     "!`Set-Content -LiteralPath $env:TEMP\\owned.txt -Value owned`\n"
                 ),
             )
-            report = validator.validate_skill(skill, mode="claude-code")
+            report = validator.validate_skill(skill, mode="agent")
             errors = self.messages(report)
             self.assertFalse(report["ok"])
             self.assertIn("unsafe named argument $target", errors)
@@ -279,7 +279,7 @@ class InjectionAuditTests(ValidatorTestCase):
     def test_protected_search_injection_is_accepted(self) -> None:
         report = validator.validate_skill(
             ROOT / "skills" / "tavily-search",
-            mode="claude-code",
+            mode="agent",
         )
         self.assertTrue(report["ok"], report["errors"])
         self.assertEqual(1, report["summary"]["dynamic_injections"])

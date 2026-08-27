@@ -19,6 +19,7 @@ allowed-tools: >-
   Bash(tvly *), Bash(uv *), Bash(pip *), Bash(python *), Bash(py *),
   Bash(${CLAUDE_SKILL_DIR}/scripts/ensure-tvly.sh *),
   PowerShell(${CLAUDE_SKILL_DIR}/scripts/ensure-tvly.ps1 *)
+disable-model-invocation: true
 ---
 
 # tavily-search (forked worker)
@@ -44,7 +45,7 @@ tkey='MISSING'
 if [ -n "${TAVILY_API_KEY:-}" ]; then
   tkey='env'
 else
-  settings_file="$HOME/.claude/settings.json"
+  settings_file="$HOME/.agents/settings.json"
   if [ -n "${HOME:-}" ] && [ -f "$settings_file" ]; then
     py=''
     command -v python3 >/dev/null 2>&1 && py=python3
@@ -72,7 +73,7 @@ echo "tavily_key=$tkey"
    If still missing → `STATUS: ERROR` (install hint). No fake results.
 3. If `tavily_key=MISSING` and commands fail with auth → `STATUS: ERROR`:
    install writes the key when prompted (`install.ps1` / `install.sh`), or set
-   `TAVILY_API_KEY` in `~/.claude/settings.json` `env` (restart Claude), or
+   `TAVILY_API_KEY` in `~/.agents/settings.json` `env` (restart your agent), or
    `tvly login --api-key tvly-…`. Key: https://tavily.com. Non-interactive
    install: `-TavilyApiKey` / `--tavily-api-key`.
 4. **Search defaults:** `--max-results 5 --json`. Escalate depth only if needed.

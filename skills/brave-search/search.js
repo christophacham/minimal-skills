@@ -65,7 +65,7 @@ const apiKey = process.env.BRAVE_API_KEY || process.env.BRAVE_SEARCH_API_KEY;
 if (!apiKey) {
 	console.error("Error: BRAVE_API_KEY (or BRAVE_SEARCH_API_KEY) environment variable is required.");
 	console.error("Get your API key at: https://api-dashboard.search.brave.com/app/keys");
-	console.error("Install writes it to ~/.claude/settings.json env, or pass -BraveApiKey to install.ps1.");
+	console.error("Install writes it to ~/.agents/settings.json env, or pass -BraveApiKey to install.ps1.");
 	process.exit(1);
 }
 

@@ -1,6 +1,6 @@
 # minimal-skills
 
-Selective Claude Code skills: search helpers, simple design, refactoring, repo discovery, architecture craft, DefectDojo ops, and Ink TUI craft — plus a plan-then-apply Node installer.
+Selective agent skills: search helpers, simple design, refactoring, repo discovery, architecture craft, DefectDojo ops, and Ink TUI craft — plus a plan-then-apply Node installer.
 
 ---
 
@@ -82,13 +82,13 @@ Defaults on a fresh project (nothing installed yet):
 | Knob | Default |
 |------|---------|
 | Scope | **project** (`cwd` or `--project`) |
-| Skill target | `.claude/skills` only |
+| Skill target | **`.agents/skills`** |
 | Selection seed | **CORE + SEARCH** (cart only — not on disk until Apply) |
 | Opt-in / Security / Specialist | off until you select them |
 
-If the active scope already has suite skills on disk, **targets and selection** seed from the scan (including the `.agents/skills` mirror when present) so startup is **in sync** — no spurious −remove pending.
+If the active scope already has suite skills on disk, **targets and selection** seed from the scan so startup is **in sync** — no spurious −remove pending.
 
-**Startup gate (project only):** when the project already has suite skills under `.claude/skills` and/or `.agents/skills`, the wizard asks first:
+**Startup gate (project only):** when the project already has suite skills under `.agents/skills`, the wizard asks first:
 
 1. **Update and continue** — overwrite those project skill dirs from this package, then open the menu  
 2. **Update and exit** — same overwrite, then quit  
@@ -98,34 +98,32 @@ Global installs are never touched by this prompt.
 
 **Main menu** (workflow order — place → pick → review → write):
 
-1. **Scope: project \| global** — project = `<root>/.claude/skills`; global = `~/.claude/skills`
-2. **Targets** — `.claude/skills` always primary; optional `.agents/skills` portable mirror (symlink → copy fallback)
-3. **Browse & select skills** — groups: Search · Core · Opt-in · Security · Specialist; optional filter; toggle is a cart, not an install
-4. **Status detail** — selected (●) vs on-disk; pending `+install` / `−remove`; paths that would change
-5. **Apply changes** — sole write path; confirms with file side-effect list for the active scope/targets  
+1. **Scope: project \| global** — project = `<root>/.agents/skills`; global = `~/.agents/skills`
+2. **Browse & select skills** — groups: Search · Core · Opt-in · Security · Specialist; optional filter; toggle is a cart, not an install
+3. **Status detail** — selected (●) vs on-disk; pending `+install` / `−remove`; paths that would change
+4. **Apply changes** — sole write path; confirms with file side-effect list for the active scope  
    —  
-6. **API keys** — Brave / Tavily / DefectDojo into `~/.claude/settings.json` only
-7. **Manage installation** — resync from disk · select defaults (CORE+SEARCH) · clear selection · uninstall tracked GLOBAL items  
+5. **API keys** — Brave / Tavily / DefectDojo into `~/.agents/settings.json` only
+6. **Manage installation** — resync from disk · select defaults (CORE+SEARCH) · clear selection · uninstall tracked GLOBAL items  
    —  
-8. **Exit** — confirms if cart still has pending changes, then discards
+7. **Exit** — confirms if cart still has pending changes, then discards
 
 ### Where files land
 
 | What | Project scope | Global scope |
 |------|---------------|--------------|
-| Skills (primary) | `<project>/.claude/skills/<id>` | `~/.claude/skills/<id>` |
-| Skills (optional mirror) | `<project>/.agents/skills/<id>` | `~/.agents/skills/<id>` |
-| API keys (Brave / Tavily / DefectDojo) | always `~/.claude/settings.json` (never the project tree) | same |
-| Global install manifest | — | `~/.claude/claude-skills-manifest.json` |
+| Skills | `<project>/.agents/skills/<id>` | `~/.agents/skills/<id>` |
+| API keys (Brave / Tavily / DefectDojo) | always `~/.agents/settings.json` (never the project tree) | same |
+| Global install manifest | — | `~/.agents/skills-manifest.json` |
 
-Claude skill dirs are a full **copy** from the package. The `.agents/skills` mirror prefers **symlink** to the Claude skill dir, **copy** on failure. This suite does **not** ship custom agent files.
+Skill dirs are a full **copy** from the package. This suite does **not** ship custom agent files.
 
 ### Apply model
 
 Selection is an in-memory **cart**. Aside from the optional **startup project refresh**, nothing is written until **Apply changes**.
 
 - **Startup project refresh** (when project skills already exist) — overwrite project skill dirs only, then continue or exit  
-- Select skills → **Apply** → installs the pending `+` set for the active scope/targets  
+- Select skills → **Apply** → installs the pending `+` set for the active scope  
 - Deselect skills → **Apply** → removes the pending `−` set (project uninstall)  
 - Cancel / Exit with pending changes → cart discarded; disk unchanged  
 - **Cross-scope guard:** if the same skill **name** is already installed in the *other* scope (e.g. global while you are in project), install is **blocked** with a clear warning — switch Scope to manage the existing copy, or remove it there first. Removes in the active scope still work.  
@@ -135,7 +133,7 @@ When you apply skills that need them, the CLI also:
 - runs `npm install` in the installed `brave-search` skill (Node 20 or >=22)
 - ensures the `ddgs` Python package when Python >=3.10 is available (`ddg-search`)
 - ensures the Tavily CLI (`tvly`) when possible (`tavily-search`)
-- may prompt for **Brave** / **Tavily** keys into `~/.claude/settings.json` (or set them later via **API keys**). Restart Claude Code after setting keys.
+- may prompt for **Brave** / **Tavily** keys into `~/.agents/settings.json` (or set them later via **API keys**). Restart your agent after setting keys.
 - when **`defectdojo-fix`** is selected and URL/token are missing, **Apply** prompts for `DEFECTDOJO_URL` then `DEFECTDOJO_API_TOKEN` (skippable; skill will `STATUS: BLOCKED` until set). Same keys are always available under **API keys**.
 
 Use `--skip-deps` to skip npm/pip/uv setup on apply.
@@ -145,7 +143,7 @@ Use `--skip-deps` to skip npm/pip/uv setup on apply.
 | Scope | How |
 |-------|-----|
 | **Project** | Wizard: deselect skills (or **Manage → Clear selection**) → **Apply**. No project manifest. |
-| **Global (tracked)** | Only items recorded in `~/.claude/claude-skills-manifest.json` |
+| **Global (tracked)** | Only items recorded in `~/.agents/skills-manifest.json` |
 
 ```sh
 npx -y github:christophacham/minimal-skills#v1.0.15 uninstall   # confirm, then remove tracked global items
@@ -169,7 +167,7 @@ Catalog groups (selective Node installer): **SEARCH** + **CORE** (default-yes) �
 ### CORE (default-yes)
 - **`simple-design`**: Ousterhout deep modules, information hiding, red flags.
 - **`refactoring`**: Fowler smells and safe structural steps.
-- **`repo-discovery`**: Scan an unfamiliar repo and write or refresh `CLAUDE.md` (agent-facing map: commands, layout, gotchas). Defaults to project-root output; refuses to invent content for an empty tree.
+- **`repo-discovery`**: Scan an unfamiliar repo and write or refresh `AGENTS.md` (agent-facing map: commands, layout, gotchas). Defaults to project-root output; refuses to invent content for an empty tree.
 
 ### OPT_IN (offer, never default-yes)
 - **`architecture-design`**: Clean Architecture layering, ports & adapters.
@@ -192,5 +190,5 @@ Narrow, task-specific skills. Install only when you need that specialty (wizard 
 
 ## Extension & Customization
 
-- **Project bindings**: test commands, commit formats, and non-negotiables from `CLAUDE.md` in the consuming app.
+- **Project bindings**: test commands, commit formats, and non-negotiables from `AGENTS.md` in the consuming app.
 - **Add a skill**: drop `skills/<id>/SKILL.md`, register it in `lib/catalog.js`, update README and installer tests.

@@ -1,6 +1,7 @@
 ---
 name: geometric-robustness
 description: "Use when writing or reviewing numeric and geometry-heavy Rust code (slicers, mesh processing, toolpaths, CAD/CAM): floating-point error budgets, robust predicates and constructions, tolerance policy, degenerate topology, deterministic output, affine transforms, property tests, and golden regressions. Covers exact classification of represented coordinates, explicit uncertainty/snap policy, certified constructions, determinism tiers, and authority of invariants over snapshots. Not for general module design, application layering, rendering-only math, or non-numeric code."
+disable-model-invocation: true
 ---
 
 # Geometric robustness

@@ -5,7 +5,7 @@
 
 .DESCRIPTION
   Read-only check with -CheckOnly. Install is idempotent. Does NOT authenticate —
-  needs TAVILY_API_KEY in env / ~/.claude/settings.json, or `tvly login`.
+  needs TAVILY_API_KEY in env / ~/.agents/settings.json, or `tvly login`.
 
 .EXAMPLE
   ./ensure-tvly.ps1
@@ -48,7 +48,7 @@ function Test-Tvly {
 
 function Get-KeyState {
     if (-not [string]::IsNullOrWhiteSpace($env:TAVILY_API_KEY)) { return 'env' }
-    $settings = Join-Path $env:USERPROFILE '.claude\settings.json'
+    $settings = Join-Path $env:USERPROFILE '.agents\settings.json'
     if (Test-Path -LiteralPath $settings) {
         try {
             $obj = Get-Content -LiteralPath $settings -Raw | ConvertFrom-Json

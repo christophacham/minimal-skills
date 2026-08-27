@@ -1,6 +1,7 @@
 ---
 name: refactoring
 description: Use when changing code structure without changing behavior — identifying code smells, choosing Fowler refactorings, planning small safe steps with compile+test between them, extracting or moving functions, simplifying conditionals, removing duplication, improving names — or when refactoring for performance (measure first, design the ideal critical path, remove special cases from hot paths). Covers Rust ownership, traits, and Result-based error handling — not for general Rust debugging or borrow-checker troubleshooting. Do not use for adding features, greenfield design, or architecture decomposition unless refactoring mechanics are requested.
+disable-model-invocation: true
 ---
 
 # Refactoring

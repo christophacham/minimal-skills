@@ -6,7 +6,7 @@ Base comes from env (not hard-coded in the skill):
 - or `DEFECTDOJO_HOST` + `DEFECTDOJO_PORT` (default 8080) + optional `DEFECTDOJO_SCHEME` (default http)
 
 Auth: `Authorization: Token <API_TOKEN>` via `DEFECTDOJO_API_TOKEN` / `API_TOKEN`  
-Prefer env / `~/.claude/settings.json` `env` / `~/.defectdojo-credentials` — never paste tokens into chat, commits, or PRs.
+Prefer env / `~/.agents/settings.json` `env` / `~/.defectdojo-credentials` — never paste tokens into chat, commits, or PRs.
 
 ```bash
 # full URL

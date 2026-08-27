@@ -43,7 +43,7 @@ Grounding rule: in Phase 4 findings must come from the local markdown, always �
               │                                      │
               │  cache dir by install scope:         │
               │   global skill → ~/.cache/arxiv-prior-art/      │
-              │   project skill → <proj>/.claude/arxiv-prior-art-cache/ │
+              │   project skill → <proj>/.agents/arxiv-prior-art-cache/ │
               │                                      │
               │   ┌─ <id>.md exists? ──yes──→ use it (no-op)     │ STATE 1
               │   │        │no                                   │

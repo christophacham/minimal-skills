@@ -21,14 +21,13 @@ import {
   planIsEmpty,
   planCounts,
   summarizePlan,
-  treesFromInstalled,
   resyncFromInstalled,
 } from '../lib/desired.js';
 import { allSkillIds, defaultSelectedSkillIds, SKILL_GROUPS } from '../lib/catalog.js';
 import { scanAllInstalled, isInstalled, skillStatus } from '../lib/scan.js';
 import { applyPlan } from '../lib/apply.js';
-import { installSkillToTree, removeSkillFromTree, trySymlink } from '../lib/fs-ops.js';
-import { skillsDestForTree } from '../lib/paths.js';
+import { installSkill, removeSkill, trySymlink } from '../lib/fs-ops.js';
+import { skillsDest } from '../lib/paths.js';
 import {
   projectSkillPlacements,
   uniqueProjectSkillIds,
@@ -123,16 +122,15 @@ describe('catalog groups', () => {
 });
 
 describe('desired planChanges', () => {
-  it('plans install for selected missing skills under project/claude', () => {
+  it('plans install for selected missing skills under project', () => {
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'project',
-      trees: ['claude'],
       selected: ['refactoring', 'simple-design'],
     });
     const plan = planChanges(state, []);
     assert.equal(plan.skillOps.length, 2);
-    assert.ok(plan.skillOps.every((o) => o.op === 'install' && o.tree === 'claude'));
+    assert.ok(plan.skillOps.every((o) => o.op === 'install'));
     assert.deepEqual(planCounts(plan), { install: 2, remove: 0 });
   });
 
@@ -140,14 +138,12 @@ describe('desired planChanges', () => {
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'project',
-      trees: ['claude'],
       selected: [],
     });
     const installed = [
       {
         id: 'refactoring',
         scope: 'project',
-        tree: 'claude',
         path: '/x',
         kind: 'dir',
       },
@@ -157,62 +153,19 @@ describe('desired planChanges', () => {
     assert.equal(plan.skillOps[0].op, 'remove');
   });
 
-  it('disabling agents tree schedules agents-tree removals', () => {
-    const state = createDesiredState({
-      projectRoot: '/tmp/proj',
-      scope: 'project',
-      trees: ['claude'],
-      selected: ['refactoring'],
-    });
+  it('seeds selected from disk so cart is in sync on startup', () => {
     const installed = [
       {
         id: 'refactoring',
         scope: 'project',
-        tree: 'claude',
         path: '/c',
         kind: 'dir',
-      },
-      {
-        id: 'refactoring',
-        scope: 'project',
-        tree: 'agents',
-        path: '/a',
-        kind: 'symlink',
-      },
-    ];
-    const plan = planChanges(state, installed);
-    assert.ok(plan.skillOps.some((o) => o.op === 'remove' && o.tree === 'agents'));
-  });
-
-  it('seeds trees+selected from disk so agents mirror is in sync on startup', () => {
-    const installed = [
-      {
-        id: 'refactoring',
-        scope: 'project',
-        tree: 'claude',
-        path: '/c',
-        kind: 'dir',
-      },
-      {
-        id: 'refactoring',
-        scope: 'project',
-        tree: 'agents',
-        path: '/a',
-        kind: 'symlink',
       },
       {
         id: 'simple-design',
         scope: 'project',
-        tree: 'claude',
         path: '/c2',
         kind: 'dir',
-      },
-      {
-        id: 'simple-design',
-        scope: 'project',
-        tree: 'agents',
-        path: '/a2',
-        kind: 'symlink',
       },
     ];
     const state = createDesiredState({
@@ -220,49 +173,25 @@ describe('desired planChanges', () => {
       scope: 'project',
       seedFromInstalled: installed,
     });
-    assert.deepEqual(state.trees, ['claude', 'agents']);
     assert.deepEqual([...state.selected].sort(), ['refactoring', 'simple-design']);
     assert.equal(planIsEmpty(planChanges(state, installed)), true);
   });
 
-  it('treesFromInstalled stays claude-only when no agents placements', () => {
+  it('resyncFromInstalled restores selected from disk', () => {
     const installed = [
       {
         id: 'refactoring',
         scope: 'project',
-        tree: 'claude',
         path: '/c',
         kind: 'dir',
-      },
-    ];
-    assert.deepEqual(treesFromInstalled(installed, 'project'), ['claude']);
-  });
-
-  it('resyncFromInstalled restores trees and selected from disk', () => {
-    const installed = [
-      {
-        id: 'refactoring',
-        scope: 'project',
-        tree: 'claude',
-        path: '/c',
-        kind: 'dir',
-      },
-      {
-        id: 'refactoring',
-        scope: 'project',
-        tree: 'agents',
-        path: '/a',
-        kind: 'symlink',
       },
     ];
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'project',
-      trees: ['claude'],
       selected: [],
     });
     resyncFromInstalled(state, installed);
-    assert.deepEqual(state.trees, ['claude', 'agents']);
     assert.ok(state.selected.has('refactoring'));
     assert.equal(planIsEmpty(planChanges(state, installed)), true);
   });
@@ -291,15 +220,13 @@ describe('desired planChanges', () => {
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'project',
-      trees: ['claude'],
       selected: ['refactoring', 'simple-design'],
     });
     const installed = [
       {
         id: 'refactoring',
         scope: 'global',
-        tree: 'claude',
-        path: '/home/x/.claude/skills/refactoring',
+        path: '/home/x/.agents/skills/refactoring',
         kind: 'dir',
       },
     ];
@@ -318,15 +245,13 @@ describe('desired planChanges', () => {
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'global',
-      trees: ['claude'],
       selected: ['architecture-design'],
     });
     const installed = [
       {
         id: 'architecture-design',
         scope: 'project',
-        tree: 'claude',
-        path: '/tmp/proj/.claude/skills/architecture-design',
+        path: '/tmp/proj/.agents/skills/architecture-design',
         kind: 'dir',
       },
     ];
@@ -340,22 +265,19 @@ describe('desired planChanges', () => {
     const state = createDesiredState({
       projectRoot: '/tmp/proj',
       scope: 'project',
-      trees: ['claude'],
       selected: [],
     });
     const installed = [
       {
         id: 'refactoring',
         scope: 'project',
-        tree: 'claude',
-        path: '/tmp/proj/.claude/skills/refactoring',
+        path: '/tmp/proj/.agents/skills/refactoring',
         kind: 'dir',
       },
       {
         id: 'refactoring',
         scope: 'global',
-        tree: 'claude',
-        path: '/home/x/.claude/skills/refactoring',
+        path: '/home/x/.agents/skills/refactoring',
         kind: 'dir',
       },
     ];
@@ -389,11 +311,10 @@ describe('apply + scan integration (isolated project)', () => {
     rmSync(home, { recursive: true, force: true });
   });
 
-  it('installs selected skills into project .claude/skills', () => {
+  it('installs selected skills into project .agents/skills', () => {
     const state = createDesiredState({
       projectRoot,
       scope: 'project',
-      trees: ['claude'],
       selected: ['refactoring', 'simple-design'],
       skipDeps: true,
     });
@@ -401,36 +322,18 @@ describe('apply + scan integration (isolated project)', () => {
     assert.ok(!planIsEmpty(plan));
     const result = applyPlan(plan, state);
     assert.equal(result.errors.length, 0);
-    assert.ok(existsSync(join(projectRoot, '.claude/skills/refactoring/SKILL.md')));
-    assert.ok(existsSync(join(projectRoot, '.claude/skills/simple-design/SKILL.md')));
+    assert.ok(existsSync(join(projectRoot, '.agents/skills/refactoring/SKILL.md')));
+    assert.ok(existsSync(join(projectRoot, '.agents/skills/simple-design/SKILL.md')));
 
     const installed = scanAllInstalled(projectRoot);
-    assert.ok(isInstalled(installed, 'refactoring', 'project', 'claude'));
-    assert.equal(skillStatus(installed, 'refactoring', 'project', ['claude']), 'installed');
-  });
-
-  it('mirrors to .agents/skills via symlink or copy', () => {
-    const state = createDesiredState({
-      projectRoot,
-      scope: 'project',
-      trees: ['claude', 'agents'],
-      selected: ['refactoring'],
-      skipDeps: true,
-    });
-    const plan = planChanges(state, scanAllInstalled(projectRoot));
-    const agentsOps = plan.skillOps.filter((o) => o.tree === 'agents' && o.op === 'install');
-    assert.ok(agentsOps.length >= 1);
-    const result = applyPlan(plan, state);
-    assert.equal(result.errors.length, 0);
-    const agentsPath = join(projectRoot, '.agents/skills/refactoring');
-    assert.ok(existsSync(agentsPath));
+    assert.ok(isInstalled(installed, 'refactoring', 'project'));
+    assert.equal(skillStatus(installed, 'refactoring', 'project'), 'installed');
   });
 
   it('removes when deselected', () => {
     const state = createDesiredState({
       projectRoot,
       scope: 'project',
-      trees: ['claude'],
       selected: [],
       skipDeps: true,
     });
@@ -440,12 +343,11 @@ describe('apply + scan integration (isolated project)', () => {
     const state2 = createDesiredState({
       projectRoot,
       scope: 'project',
-      trees: ['claude'],
       selected: [],
       skipDeps: true,
     });
     applyPlan(planChanges(state2, scanAllInstalled(projectRoot)), state2);
-    assert.ok(!existsSync(join(projectRoot, '.claude/skills/refactoring')));
+    assert.ok(!existsSync(join(projectRoot, '.agents/skills/refactoring')));
   });
 });
 
@@ -462,7 +364,7 @@ describe('settings helpers (DefectDojo)', () => {
 
     const dir = mkdtempSync(join(tmpdir(), 'cs-settings-'));
     const settingsFile = join(dir, 'settings.json');
-    // Empty isolated file — no host ~/.claude/settings.json bleed-through.
+    // Empty isolated file — no host ~/.agents/settings.json bleed-through.
     writeFileSync(settingsFile, '{}\n', 'utf8');
 
     const prevUrl = process.env.DEFECTDOJO_URL;
@@ -550,16 +452,15 @@ describe('trySymlink', () => {
   });
 });
 
-describe('installSkillToTree direct', () => {
+describe('installSkill direct', () => {
   it('copies package skill into isolated project', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'cs-skill-'));
     try {
-      const r = installSkillToTree('refactoring', 'claude', 'project', projectRoot);
-      assert.equal(r.kind, 'dir');
-      assert.ok(existsSync(join(r.path, 'SKILL.md')));
-      removeSkillFromTree('refactoring', 'claude', 'project', projectRoot);
+      const r = installSkill('refactoring', 'project', projectRoot);
+      assert.ok(existsSync(join(r, 'SKILL.md')));
+      removeSkill('refactoring', 'project', projectRoot);
       assert.ok(
-        !existsSync(join(skillsDestForTree('claude', 'project', projectRoot), 'refactoring')),
+        !existsSync(join(skillsDest('project', projectRoot), 'refactoring')),
       );
     } finally {
       rmSync(projectRoot, { recursive: true, force: true });
@@ -572,8 +473,8 @@ describe('project refresh (overwrite existing project skills)', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref-'));
     try {
       assert.equal(projectHasInstalledSkills(projectRoot), false);
-      installSkillToTree('simple-design', 'claude', 'project', projectRoot);
-      installSkillToTree('refactoring', 'claude', 'project', projectRoot);
+      installSkill('simple-design', 'project', projectRoot);
+      installSkill('refactoring', 'project', projectRoot);
       const installed = scanAllInstalled(projectRoot);
       assert.deepEqual(uniqueProjectSkillIds(installed), [
         'refactoring',
@@ -590,7 +491,7 @@ describe('project refresh (overwrite existing project skills)', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref2-'));
     try {
       const dest = join(
-        skillsDestForTree('claude', 'project', projectRoot),
+        skillsDest('project', projectRoot),
         'simple-design',
       );
       mkdirSync(dest, { recursive: true });
@@ -598,7 +499,7 @@ describe('project refresh (overwrite existing project skills)', () => {
       writeFileSync(join(dest, 'STALE_MARKER.txt'), 'old');
 
       const result = refreshProjectSkills(projectRoot, { skipDeps: true });
-      assert.ok(result.refreshed.includes('simple-design@claude'));
+      assert.ok(result.refreshed.includes('simple-design'));
       assert.equal(result.errors.length, 0);
       assert.equal(result.version, packageVersion);
       assert.ok(existsSync(join(dest, 'SKILL.md')));
@@ -606,27 +507,6 @@ describe('project refresh (overwrite existing project skills)', () => {
       const body = readFileSync(join(dest, 'SKILL.md'), 'utf8');
       assert.ok(!body.includes('stale local copy'));
       assert.match(body, /simple-design|Simple Design|simple design/i);
-    } finally {
-      rmSync(projectRoot, { recursive: true, force: true });
-    }
-  });
-
-  it('refreshes both claude and agents trees in project only', () => {
-    const projectRoot = mkdtempSync(join(tmpdir(), 'cs-pref3-'));
-    try {
-      installSkillToTree('refactoring', 'claude', 'project', projectRoot);
-      installSkillToTree('refactoring', 'agents', 'project', projectRoot);
-      const claudeDest = join(
-        skillsDestForTree('claude', 'project', projectRoot),
-        'refactoring',
-      );
-      writeFileSync(join(claudeDest, 'STALE.txt'), 'x');
-
-      const result = refreshProjectSkills(projectRoot, { skipDeps: true });
-      assert.ok(result.refreshed.includes('refactoring@claude'));
-      assert.ok(result.refreshed.includes('refactoring@agents'));
-      assert.ok(!existsSync(join(claudeDest, 'STALE.txt')));
-      assert.ok(existsSync(join(claudeDest, 'SKILL.md')));
     } finally {
       rmSync(projectRoot, { recursive: true, force: true });
     }

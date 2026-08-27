@@ -2,8 +2,8 @@
 # Shared env/credentials resolution for DefectDojo scripts.
 # Source this file; never prints token values.
 #
-# Does NOT read ~/.claude/settings.json — that file is only visible to
-# scripts when Claude Code has already injected env into the process.
+# Does NOT read ~/.agents/settings.json — that file is only visible to
+# scripts when the agent harness has already injected env into the process.
 # Outside the harness: export vars or use ~/.defectdojo-credentials.
 #
 # Exports:

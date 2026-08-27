@@ -67,10 +67,10 @@ class RefactoringSkillTests(unittest.TestCase):
 
 
 class RepoDiscoverySkillTests(unittest.TestCase):
-    def test_writes_claudemd_from_evidence(self) -> None:
+    def test_writes_agentsmd_from_evidence(self) -> None:
         text = (SKILLS / "repo-discovery" / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("name: repo-discovery", text)
-        self.assertIn("CLAUDE.md", text)
+        self.assertIn("AGENTS.md", text)
         # Skill must refuse to invent content for an empty tree.
         self.assertIn("empty", text.lower())
         # Must call out no inventing commands/architecture/etc.

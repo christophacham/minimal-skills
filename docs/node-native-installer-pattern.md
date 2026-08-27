@@ -60,13 +60,11 @@ apply      = applyPlan(plan, desired)        // sole mutator
 | Knob | Default |
 |---|---|
 | Scope | **project** (`--project` or cwd) |
-| Skill trees | `['claude']` only |
-| `.agents/skills` mirror | off until toggled under Targets |
-| Claude install | full **copy** from package `skills/<id>` |
-| `.agents/skills` install | **symlink/junction** to Claude skill dir → **copy** fallback |
+| Skill target | **`.agents/skills`** |
+| Install | full **copy** from package `skills/<id>` |
 | Custom agent roster | none (suite installs skills only) |
-| API keys | always `~/.claude/settings.json` |
-| Deps | run against **claude** skill path only |
+| API keys | always `~/.agents/settings.json` |
+| Deps | run against `.agents/skills` path |
 
 ### Groups (`lib/catalog.js` → `SKILL_GROUPS`)
 
@@ -76,13 +74,12 @@ apply      = applyPlan(plan, desired)        // sole mutator
 4. **SECURITY** — offer only (vuln trackers; e.g. `defectdojo-fix`)  
 5. **SPECIALIST** — offer only (narrow load-on-demand; e.g. `ink-cli-tui`)  
 
-Fresh project with nothing installed: seed selected = `defaultSelectedSkillIds()`, trees = `['claude']`.
-If the active scope already has suite skills on disk: seed **trees + selected** from scan
-(`treesFromInstalled` / `resyncFromInstalled`) so an existing `.agents/skills` mirror does not
-show as pending −remove on startup.
+Fresh project with nothing installed: seed selected = `defaultSelectedSkillIds()`.
+If the active scope already has suite skills on disk: seed **selected** from scan
+(`resyncFromInstalled`) so existing installs do not show as pending −remove on startup.
 
 **Project refresh gate (before main menu):** when any catalog skill is present under
-**project** scope (`.claude/skills` and/or `.agents/skills`), the wizard prompts:
+**project** scope (`.agents/skills` and/or `.agents/skills`), the wizard prompts:
 
 - Update and continue — `refreshProjectSkills` overwrites those project placements
   from the running package, then opens the menu  
@@ -95,7 +92,7 @@ Global scope is never modified by this gate (`lib/project-refresh.js`).
 
 Workflow order (separators in the TUI):
 
-**Scope · Targets · Browse · Status · Apply** · | · **API keys · Manage** · | · **Exit**
+**Scope · Browse · Status · Apply** · | · **API keys · Manage** · | · **Exit**
 
 Apply is the main path that writes skills from the cart; global applies also update the manifest.
 The project refresh gate (above) is the only other write path and is project-scope only.
@@ -105,26 +102,25 @@ Cancel discards the in-memory cart (no partial mid-menu writes).
 
 `lib/paths.js` is the placement authority:
 
-- Claude tree: `~/.claude` or `<project>/.claude`  
-- Agents skill tree: `~/.agents` or `<project>/.agents`  
-- Skill dirs: `<tree-root>/skills/<id>`  
+- Skill root: `~/.agents` or `<project>/.agents`
+- Skill dirs: `<root>/skills/<id>`  
 
 The current suite installs skills only. It does not ship or place custom agent files.
 
 ## Manifest and uninstall ownership
 
 The Node installer records only **global** items it installed in
-`~/.claude/claude-skills-manifest.json`. `lib/uninstall-flow.js` removes only
+`~/.agents/skills-manifest.json`. `lib/uninstall-flow.js` removes only
 those recorded global entries, then clears the manifest. Current installs add
 skills only; legacy agent/panelist fields remain readable for cleanup compatibility.
 
 There is **no project manifest**. Project uninstall is “deselect + Apply” in the
-wizard for the active project scope/targets.
+wizard for the active project scope.
 
 Left alone by smart global uninstall:
 
-- project `.claude` / `.agents` installs  
-- API keys in `~/.claude/settings.json`  
+- project `.agents` installs
+- API keys in `~/.agents/settings.json`  
 - npm/Python/uv dependencies  
 
 ## Module map
@@ -142,7 +138,7 @@ Left alone by smart global uninstall:
 | Legacy linear flow | `lib/install-flow-legacy.js` |
 | Compat `runInstallFlow` → wizard | `lib/install-flow.js` |
 | Tracked global uninstall | `lib/uninstall-flow.js` |
-| Dual-tree destinations | `lib/paths.js` |
+| Placement destinations | `lib/paths.js` |
 | Copy / symlink / remove | `lib/fs-ops.js` |
 | Dependency setup | `lib/deps.js` |
 | Manifest schema/merge | `lib/manifest.js` |
@@ -162,9 +158,8 @@ npm pack --dry-run
 For flow changes, use isolated temporary HOME/project directories and verify:
 
 - absolute and relative `--project` resolution  
-- selected items land only in the intended roots  
-- agents tree is symlink (or copy fallback) to claude tree  
-- global manifest entries are deduplicated and sorted  
+- selected items land only in the intended roots
+- global manifest entries are deduplicated and sorted
 - uninstall removes recorded global items only  
 - project files, foreign files, settings keys, and dependencies survive  
 - no credential value appears on stdout/stderr  
