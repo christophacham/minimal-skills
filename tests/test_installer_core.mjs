@@ -99,12 +99,17 @@ describe('catalog groups', () => {
     assert.match(optIn.hint, /C4/i);
   });
 
-  it('known suite is the thirteen kept skills', () => {
+  it('known suite includes the five audit skills', () => {
     assert.deepEqual(
       [...known].sort(),
       [
         'architecture-design',
         'arxiv-prior-art',
+        'audit-architecture',
+        'audit-performance',
+        'audit-repository',
+        'audit-simplification',
+        'audit-verification',
         'brave-search',
         'c4-model',
         'ddg-search',
@@ -453,6 +458,27 @@ describe('trySymlink', () => {
 });
 
 describe('installSkill direct', () => {
+  it('offers audit skills without default selection and installs their resources', () => {
+    const projectRoot = mkdtempSync(join(tmpdir(), 'cs-audits-'));
+    try {
+      for (const id of known.filter((name) => name.startsWith('audit-'))) {
+        assert.ok(!defaultSelectedSkillIds().includes(id), id);
+        const installed = installSkill(id, 'project', projectRoot);
+        const files = ['SKILL.md', 'agents/openai.yaml'];
+        if (id === 'audit-architecture') files.push('references/audit-lenses.md');
+        for (const file of files) {
+          assert.equal(
+            readFileSync(join(installed, file), 'utf8'),
+            readFileSync(new URL(`../skills/${id}/${file}`, import.meta.url), 'utf8'),
+            `${id}/${file}`,
+          );
+        }
+      }
+    } finally {
+      rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   it('copies package skill into isolated project', () => {
     const projectRoot = mkdtempSync(join(tmpdir(), 'cs-skill-'));
     try {

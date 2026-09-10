@@ -1,0 +1,3 @@
+interface:
+  display_name: "Audit Performance"
+  short_description: "Measure bottlenecks and verify performance wins"
