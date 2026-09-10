@@ -1,0 +1,3 @@
+interface:
+  display_name: "Audit Architecture"
+  short_description: "Find evidenced architecture simplifications"

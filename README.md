@@ -170,11 +170,18 @@ Catalog groups (selective Node installer): **SEARCH** + **CORE** (default-yes) �
 - **`repo-discovery`**: Scan an unfamiliar repo and write or refresh `AGENTS.md` (agent-facing map: commands, layout, gotchas). Defaults to project-root output; refuses to invent content for an empty tree.
 
 ### OPT_IN (offer, never default-yes)
+- **`audit-architecture`**: Evidence-based complexity and boundary audit, with a numbered reference preserving all 36 original audit concerns.
+- **`audit-verification`**: Diagnose and improve setup, fixtures, diagnostics, and practical verification loops.
+- **`audit-simplification`**: Assess or implement an agreed simplification, including recovery of stuck work.
+- **`audit-performance`**: Measure bottlenecks and verify improvements on representative workloads.
+- **`audit-repository`**: Triage issues and PRs, then complete authorized maintenance and delivery.
 - **`architecture-design`**: Clean Architecture layering, ports & adapters.
 - **`distributed-architecture`**: Trade-offs across deployables — granularity, monolith decomposition, data, sagas, contracts.
 - **`geometric-robustness`**: Float/geometry robustness for slicers and CAD/CAM (Rust).
 - **`arxiv-prior-art`**: Check arXiv prior art before committing to non-trivial architecture/algorithms — real fetches, isolated parallel reads, converges on ONE recommended path with citations and pitfalls.
 - **`c4-model`**: C4 model maps of software architecture — context, containers, components, code, plus dynamic/deployment/landscape; notation quality bar and microservice/messaging mapping.
+
+The audit skills work independently. A typical sequence is architecture findings → agreed change → any needed verification improvement → implementation and review. Run performance or repository maintenance when relevant. An audit alone produces findings; an implementation request permits the scoped changes. Project-specific rules stay in the consuming repository's `AGENTS.md`.
 
 ### SECURITY (offer, never default-yes)
 Vuln-tracker integrations. Need host credentials (env / settings / credentials file); not a substitute for PR security review.
